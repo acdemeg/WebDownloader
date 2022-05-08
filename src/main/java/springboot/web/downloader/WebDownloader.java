@@ -12,7 +12,7 @@ public class WebDownloader {
 	public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
 		var app = SpringApplication.run(WebDownloader.class, args);
 		Wget wget = app.getBean(Wget.class);
-		wget.download("");
+		wget.download("http://java-course.ru/");
 	}
 
 }

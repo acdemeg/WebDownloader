@@ -4,6 +4,7 @@ import java.util.TreeMap;
 
 /**
  * Here described methods need for built site map
+ * and validate of links
  */
 public interface IWebScanner {
 

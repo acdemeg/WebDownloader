@@ -20,5 +20,6 @@ public class ZipImpl implements Zip {
         var process = new ProcessBuilder("sh", "-c", zip + mv)
                 .directory(new File(WebDownloader.baseDir)).start();
         Utils.factory().logProcess(process, "ZIP_Output");
+        log.info("Exit code: " + process.waitFor());
     }
 }

@@ -15,11 +15,15 @@ public class Utils {
         return new Utils();
     }
 
-    public void logProcess(Process process, String processName) throws IOException, InterruptedException {
+    public void logProcess(Process process, String processName) throws IOException {
         log.info(processName);
         log.info(IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8));
-        int exitCode = process.waitFor();
-        log.info("Exit code: " + exitCode);
+    }
+
+    public void wgetLogging(String dir) throws IOException {
+        File file = new File(dir + "/wget-log");
+        var lines = FileUtils.readLines(file, "UTF-8");
+        log.info(String.join("\n", lines));
     }
 
     public void createDirectory(String dir) throws IOException {

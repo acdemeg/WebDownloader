@@ -21,7 +21,10 @@ public class WgetImpl implements Wget {
     public void download(String URI, String dir) throws InterruptedException, IOException {
         var process = new ProcessBuilder("sh", "-c", wgetOptions.getWget() + URI)
                 .directory(new File(dir)).start();
-        Utils.factory().logProcess(process, "WGET_Output");
+        var utils = Utils.factory();
+        utils.logProcess(process, "WGET_Output");
+        utils.wgetLogging(dir);
+        log.info("Exit code: " + process.waitFor());
     }
 
 }

@@ -5,5 +5,5 @@ import java.util.concurrent.ExecutionException;
 
 public interface Wget {
 
-    void download(String URI) throws ExecutionException, InterruptedException, IOException;
+    void download(String URI, String dir) throws ExecutionException, InterruptedException, IOException;
 }

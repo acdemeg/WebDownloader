@@ -19,6 +19,6 @@ public class WgetOptions {
     private final String backgroundRun = "--background"; //off
     private final String logFile = "--output-file=wget-log";
     private final String mirror = "--recursive --timestamping --level " + level + " --dont-remove-listing";
-    private final String wget = String.format("wget %s %s %s %s %s %s %s %s %s %s ", userAgent, referer, logFile,
-            ignoreRobotsTxt, noCheckCertificate, pageRequisites, htmlExtension, convertLinks, "", mirror);
+    private final String wget = String.format("wget %s %s %s %s %s %s %s %s %s ", userAgent, referer, logFile,
+            ignoreRobotsTxt, noCheckCertificate, pageRequisites, htmlExtension, convertLinks, mirror);
 }

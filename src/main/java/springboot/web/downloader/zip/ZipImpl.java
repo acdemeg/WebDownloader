@@ -1,29 +1,24 @@
 package springboot.web.downloader.zip;
 
-import org.apache.commons.io.IOUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
+import springboot.web.downloader.WebDownloader;
+import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Service
 public class ZipImpl implements Zip {
 
     @Override
     public void wrapToZip(String source) throws IOException, InterruptedException {
         String dest = source + ".zip";
-        String zip = "zip -r " + dest + " " + source;
-        //todo 'archived' and 'sites' must be created
-        String mv = " && mv " + dest + " archived";
+        String zip = "zip -9 -r " + dest + " " + source;
+        String mv = " && mv " + dest + " ../archived";
         var process = new ProcessBuilder("sh", "-c", zip + mv)
-                .directory(new File("src/main/resources/sites")).start();
-
-        String output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
-        System.out.println(output);
-
-        int exitCode = process.waitFor();
-        System.out.println("Exit code: " + exitCode);
+                .directory(new File(WebDownloader.baseDir)).start();
+        Utils.factory().logProcess(process, "ZIP_Output");
     }
 }

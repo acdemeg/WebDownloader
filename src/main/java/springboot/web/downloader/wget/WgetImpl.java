@@ -1,11 +1,13 @@
 package springboot.web.downloader.wget;
 
-import org.apache.commons.io.IOUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import springboot.web.downloader.utils.Utils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
 
+@Slf4j
 @Service
 public class WgetImpl implements Wget {
 
@@ -16,15 +18,10 @@ public class WgetImpl implements Wget {
     }
 
     @Override
-    public void download(String URI) throws InterruptedException, IOException {
+    public void download(String URI, String dir) throws InterruptedException, IOException {
         var process = new ProcessBuilder("sh", "-c", wgetOptions.getWget() + URI)
-                .directory(new File("src/main/resources/sites")).start();
-
-        String output = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
-        System.out.println(output);
-
-        int exitCode = process.waitFor();
-        System.out.println("Exit code: " + exitCode);
+                .directory(new File(dir)).start();
+        Utils.factory().logProcess(process, "WGET_Output");
     }
 
 }

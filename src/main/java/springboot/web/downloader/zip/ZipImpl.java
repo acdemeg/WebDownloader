@@ -18,7 +18,7 @@ public class ZipImpl implements Zip {
         String zip = "zip -9 -r " + dest + " " + source;
         String mv = " && mv " + dest + " ../archived";
         var process = new ProcessBuilder("sh", "-c", zip + mv)
-                .directory(new File(WebDownloader.baseDir)).start();
+                .directory(new File(WebDownloader.baseSites)).start();
         Utils.factory().logProcess(process, "ZIP_Output");
         log.info("Exit code: " + process.waitFor());
     }

@@ -12,7 +12,8 @@ import java.util.concurrent.ExecutionException;
 @SpringBootApplication
 public class WebDownloader {
 
-	public final static String baseDir = "src/main/resources/sites/";
+	public final static String baseSites = "src/main/resources/sites/";
+	public final static String baseArchived = "src/main/resources/archived/";
 
 	public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
 		var app = SpringApplication.run(WebDownloader.class, args);

@@ -1,5 +1,6 @@
 package springboot.web.downloader.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -8,17 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.service.RestService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 
+@Slf4j
 @RestController
 public class Rest {
 
@@ -44,10 +44,8 @@ public class Rest {
     }
 
     @GetMapping(path = "/require", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> requireDownload(@RequestParam(value = "uri") final String URI)
-            throws IOException, ExecutionException, InterruptedException {
-        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-        return this.restService.requireDownload(URI, sessionId);
+    public ResponseEntity<?> requireDownload(@RequestParam(value = "uri") final String URI) {
+        return this.restService.requireDownload(URI);
     }
 
     @GetMapping(path = "/estimate", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,4 +59,5 @@ public class Rest {
         return ResponseEntity.ok()
                 .body(null);
     }
+
 }

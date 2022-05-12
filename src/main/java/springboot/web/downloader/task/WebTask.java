@@ -7,6 +7,12 @@ import springboot.web.downloader.zip.Zip;
 
 import java.util.concurrent.Callable;
 
+/**
+ * This class is abstract task created after client request
+ * which must be processed in separate thread.
+ * WebTask have {@code taskId} identifier thought it
+ * client able to monitoring WebTask status
+ */
 public class WebTask implements Callable<String> {
 
     private final Wget wget = WebDownloader.appContext.getBean(Wget.class);

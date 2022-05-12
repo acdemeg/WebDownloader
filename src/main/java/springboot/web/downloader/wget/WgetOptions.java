@@ -3,9 +3,13 @@ package springboot.web.downloader.wget;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class represent set of params which can be
+ * used for specify 'wget' shell-utility
+ */
 @Data
 @Component
-public class WgetOptions {
+public final class WgetOptions {
 
     private final String userAgent = "--user-agent=\"Mozilla/5.0 (X11; Linux x86_64)" +
             " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36\"";

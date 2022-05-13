@@ -13,8 +13,8 @@ import java.io.IOException;
 @SpringBootApplication
 public class WebDownloader {
 
-	public final static String baseSites = "src/main/resources/sites/";
-	public final static String baseArchived = "src/main/resources/archived/";
+	public final static String baseSites = System.getProperty("user.home") + "/sites/";
+	public final static String baseArchived = System.getProperty("user.home") + "/archived/";
 	public static ConfigurableApplicationContext appContext;
 
 	public static void main(String[] args) throws IOException {

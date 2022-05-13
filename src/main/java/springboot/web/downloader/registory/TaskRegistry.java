@@ -1,6 +1,6 @@
 package springboot.web.downloader.registory;
 
-import org.springframework.stereotype.Service;
+import springboot.web.downloader.task.StatusTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
  * TaskRegistry based on {@code Map} interface.
  * Registry formed as --> Map<taskId:STRING, taskThread:FUTURE<STRING>>
  */
-@Service
 public final class TaskRegistry {
-    public static final Map<String, Future<String>> registry = new HashMap<>();
+    public static final Map<String, Future<StatusTask>> registry = new HashMap<>();
 }

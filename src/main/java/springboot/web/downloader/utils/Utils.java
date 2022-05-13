@@ -45,7 +45,7 @@ public final class Utils {
      */
     public void wgetLogging(String dir) throws IOException {
         File file = new File(dir + "/wget-log");
-        var lines = FileUtils.readLines(file, "UTF-8");
+        final var lines = FileUtils.readLines(file, "UTF-8");
         log.info(String.join("\n", lines));
     }
 
@@ -65,7 +65,7 @@ public final class Utils {
      * @return exit code shell-utility
      */
     public int runProcess(String command, String processName, String workDir) throws IOException, InterruptedException {
-        var process = new ProcessBuilder("sh", "-c", command)
+        final var process = new ProcessBuilder("sh", "-c", command)
                 .directory(new File(workDir)).start();
         this.logProcess(process, processName + "_Output");
         int exitCode = process.waitFor();

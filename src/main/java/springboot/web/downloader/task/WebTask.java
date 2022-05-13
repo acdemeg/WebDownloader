@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
  * WebTask have {@code taskId} identifier thought it
  * client able to monitoring WebTask status
  */
-public class WebTask implements Callable<String> {
+public class WebTask implements Callable<StatusTask> {
 
     private final Wget wget = WebDownloader.appContext.getBean(Wget.class);
     private final Utils utils = WebDownloader.appContext.getBean(Utils.class);
@@ -27,12 +27,12 @@ public class WebTask implements Callable<String> {
     }
 
     @Override
-    public String call() throws Exception {
+    public StatusTask call() throws Exception {
         String dir = WebDownloader.baseSites + taskId;
         utils.createDirectory(dir);
         int exitWget = wget.download(URI, dir);
         utils.wgetLogging(dir);
         int exitZip = zip.wrapToZip(taskId);
-        return (exitWget == 0 && exitZip == 0) ? "Done" : "Error";
+        return (exitWget == 0 && exitZip == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 }

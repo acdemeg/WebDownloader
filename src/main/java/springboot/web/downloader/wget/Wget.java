@@ -13,8 +13,10 @@ public interface Wget {
      * This method perform run shell-utility 'wget'
      * with need number of parameters in order to
      * create local copy web-resource
+     *
      * @param URI root link web-resource
      * @param dir dest folder for download
+     * @return status code shell-command
      */
-    void download(String URI, String dir) throws ExecutionException, InterruptedException, IOException;
+    int download(String URI, String dir) throws ExecutionException, InterruptedException, IOException;
 }

@@ -23,7 +23,6 @@ public class RestService {
      * @return taskId
      */
     public ResponseEntity<?> requireDownload(final String URI) {
-
         String taskId = UUID.randomUUID().toString();
         var exec = Executors.newSingleThreadExecutor();
         var future = exec.submit(new WebTask(taskId, URI));

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import springboot.web.downloader.utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 
 @Slf4j
@@ -22,12 +21,9 @@ public class WgetImpl implements Wget {
     }
 
     @Override
-    public void download(String URI, String dir) throws InterruptedException, IOException {
-        var process = new ProcessBuilder("sh", "-c", wgetOptions.getWget() + URI)
-                .directory(new File(dir)).start();
-        utils.logProcess(process, "WGET_Output");
-        log.info("Exit code: " + process.waitFor());
-        utils.wgetLogging(dir);
+    public int download(String URI, String dir) throws InterruptedException, IOException {
+        String command = wgetOptions.getWget() + URI;
+        return utils.runProcess(command, "WGET", dir);
     }
 
 }

@@ -30,8 +30,9 @@ public class WebTask implements Callable<String> {
     public String call() throws Exception {
         String dir = WebDownloader.baseSites + taskId;
         utils.createDirectory(dir);
-        wget.download(URI, dir);
-        zip.wrapToZip(taskId);
-        return "Done";
+        int exitWget = wget.download(URI, dir);
+        utils.wgetLogging(dir);
+        int exitZip = zip.wrapToZip(taskId);
+        return (exitWget == 0 && exitZip == 0) ? "Done" : "Error";
     }
 }

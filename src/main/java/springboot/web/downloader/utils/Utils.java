@@ -16,12 +16,12 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 @Service
-public class Utils {
+public final class Utils {
 
     /**
      * Method perform creating folders for 'sites' and 'archived'
      * @throws IOException if occurs error in time creating folders
-     *  or files with same name already exist
+     * or files with same name already exist
      */
     public static void prepareDirectories() throws IOException {
         FileUtils.forceMkdir(new File(WebDownloader.baseSites));
@@ -55,5 +55,21 @@ public class Utils {
      */
     public void createDirectory(String dir) throws IOException {
         FileUtils.forceMkdir(new File(dir));
+    }
+
+    /**
+     * Common method for run any native process
+     * @param command shell executed command with params
+     * @param processName name process which run
+     * @param workDir working directory for run process
+     * @return exit code shell-utility
+     */
+    public int runProcess(String command, String processName, String workDir) throws IOException, InterruptedException {
+        var process = new ProcessBuilder("sh", "-c", command)
+                .directory(new File(workDir)).start();
+        this.logProcess(process, processName + "_Output");
+        int exitCode = process.waitFor();
+        log.info("Exit code: " + exitCode);
+        return exitCode;
     }
 }

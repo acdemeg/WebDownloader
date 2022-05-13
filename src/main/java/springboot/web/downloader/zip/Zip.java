@@ -11,7 +11,9 @@ public interface Zip {
     /**
      * This method perform run shell-utility 'zip' which to aim
      * creating .zip file and move .zip file in archive folder
+     *
      * @param siteFolder name site location folder
+     * @return status code shell-command
      */
-    void wrapToZip(String siteFolder) throws IOException, InterruptedException;
+    int wrapToZip(String siteFolder) throws IOException, InterruptedException;
 }

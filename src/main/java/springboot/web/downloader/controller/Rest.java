@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springboot.web.downloader.service.RestService;
+import springboot.web.downloader.utils.Utils;
 
 import java.io.IOException;
 
@@ -27,19 +28,20 @@ public class Rest {
 
     @GetMapping(path = "/require", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> requireDownload(@RequestParam(value = "uri") final String URI) {
-        return this.restService.requireDownload(URI);
+        var response = Utils.isLiveConnection(URI);
+        return (response.getStatusCode().isError()) ? response : this.restService.requireDownload(URI);
     }
 
     @GetMapping(path = "/estimate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> estimateSize(){
-        return ResponseEntity.ok()
-                .body("ok");
+    public ResponseEntity<?> estimateSize(@RequestParam(value = "uri") final String URI){
+        var response = Utils.isLiveConnection(URI);
+        return (response.getStatusCode().isError()) ? response : this.restService.estimateSize(URI);
     }
 
     @GetMapping(path = "/map", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> mapSite(){
-        return ResponseEntity.ok()
-                .body("ok");
+    public ResponseEntity<?> mapSite(@RequestParam(value = "uri") final String URI){
+        var response = Utils.isLiveConnection(URI);
+        return (response.getStatusCode().isError()) ? response : this.restService.mapSite(URI);
     }
 
 }

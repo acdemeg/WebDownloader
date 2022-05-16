@@ -11,6 +11,7 @@ import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionTwoArgs;
+import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +38,18 @@ public class RestServiceImpl implements RestService {
         final var future = exec.submit(webTaskFactory.apply(taskId, URI));
         TaskRegistry.registry.put(taskId, future);
         exec.shutdown();
+        return ResponseEntity.ok().body(taskId);
+    }
+
+    @Override
+    public ResponseEntity<?> estimateSize(String URI) {
+        String taskId = UUID.randomUUID().toString();
+        return ResponseEntity.ok().body(taskId);
+    }
+
+    @Override
+    public ResponseEntity<?> mapSite(String URI) {
+        String taskId = UUID.randomUUID().toString();
         return ResponseEntity.ok().body(taskId);
     }
 

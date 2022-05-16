@@ -13,11 +13,26 @@ public interface RestService {
     /**
      * This method run new thread which processed WGET and ZIP
      * steps and return {@code taskId} for monitoring download status
-     *
      * @param URI is root web-link which came from client
-     * @return taskId
+     * @return taskId if URI is available else {@code ErrorStruct}
      */
     ResponseEntity<?> requireDownload(String URI);
+
+    /**
+     * Method performs estimate web-resource size (only
+     * static content available for wget processing)
+     * @param URI is root web-link which came from client
+     * @return taskId if URI is available else {@code ErrorStruct}
+     */
+    ResponseEntity<?> estimateSize(String URI);
+
+    /**
+     * This method pick up all links on site and build map of site
+     * whether using {@code sitemap.xml} if exist
+     * @param URI is root web-link which came from client
+     * @return taskId if URI is available else {@code ErrorStruct}
+     */
+    ResponseEntity<?> mapSite(String URI);
 
     /**
      * This method allow download zip archive as octet-stream

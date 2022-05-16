@@ -1,6 +1,7 @@
 package springboot.web.downloader.service;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
+import springboot.web.downloader.utils.FunctionTwoArgs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,11 +23,18 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 @Service
 public class RestServiceImpl implements RestService {
 
+    private final FunctionTwoArgs<String, String, WebTask> webTaskFactory;
+
+    @Autowired
+    public RestServiceImpl(FunctionTwoArgs<String, String, WebTask> webTaskFactory) {
+        this.webTaskFactory = webTaskFactory;
+    }
+
     @Override
     public ResponseEntity<?> requireDownload(final String URI) {
         String taskId = UUID.randomUUID().toString();
         final var exec = Executors.newSingleThreadExecutor();
-        final var future = exec.submit(new WebTask(taskId, URI));
+        final var future = exec.submit(webTaskFactory.apply(taskId, URI));
         TaskRegistry.registry.put(taskId, future);
         exec.shutdown();
         return ResponseEntity.ok().body(taskId);

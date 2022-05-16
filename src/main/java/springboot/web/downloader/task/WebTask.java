@@ -16,14 +16,16 @@ import java.util.concurrent.Callable;
  */
 public class WebTask implements Callable<StatusTask> {
 
-    private final Wget wget = WebDownloader.appContext.getBean(Wget.class);
-    private final Zip zip = WebDownloader.appContext.getBean(Zip.class);
+    private final Wget wget;
+    private final Zip zip;
     private final String taskId;
     private final String URI;
 
-    public WebTask(String taskId, String uri) {
+    public WebTask(Wget wget, Zip zip, String taskId, String URI) {
+        this.wget = wget;
+        this.zip = zip;
         this.taskId = taskId;
-        URI = uri;
+        this.URI = URI;
     }
 
     @Override

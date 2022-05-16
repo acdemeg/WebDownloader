@@ -12,18 +12,16 @@ import java.io.IOException;
 public class WgetImpl implements Wget {
 
     private final WgetOptions wgetOptions;
-    private final Utils utils;
 
     @Autowired
-    public WgetImpl(WgetOptions wgetOptions, Utils utils) {
+    public WgetImpl(WgetOptions wgetOptions) {
         this.wgetOptions = wgetOptions;
-        this.utils = utils;
     }
 
     @Override
     public int download(String URI, String dir) throws InterruptedException, IOException {
         String command = wgetOptions.getWget() + URI;
-        return utils.runProcess(command, "WGET", dir);
+        return Utils.runProcess(command, "WGET", dir);
     }
 
 }

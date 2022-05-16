@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 public class WebTask implements Callable<StatusTask> {
 
     private final Wget wget = WebDownloader.appContext.getBean(Wget.class);
-    private final Utils utils = WebDownloader.appContext.getBean(Utils.class);
     private final Zip zip = WebDownloader.appContext.getBean(Zip.class);
     private final String taskId;
     private final String URI;
@@ -31,11 +30,11 @@ public class WebTask implements Callable<StatusTask> {
     public StatusTask call() throws Exception {
         int exitCode = 1;
         String dir = WebDownloader.baseSites + taskId;
-        utils.createDirectory(dir);
+        Utils.createDirectory(dir);
         if(wget.download(URI, dir) == 0){
             exitCode = zip.wrapToZip(taskId);
         }
-        utils.wgetLogging(dir);
+        Utils.wgetLogging(dir);
         return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 }

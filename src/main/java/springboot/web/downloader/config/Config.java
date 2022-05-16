@@ -12,6 +12,10 @@ import springboot.web.downloader.utils.LoggableHttpTraceRepository;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
 
+/**
+ * This class contain beans definitions
+ * which using in application
+ */
 @Slf4j
 @Configuration
 public class Config {
@@ -25,11 +29,21 @@ public class Config {
         this.zip = zip;
     }
 
+    /**
+     * Bean is repository which keeping last 100 http-request
+     * and presenting logging ability in separate file
+     * @return {@code HttpTrace} repository
+     */
     @Bean
     public HttpTraceRepository httpTraceRepository() {
         return new LoggableHttpTraceRepository();
     }
 
+    /**
+     * Two next beans represents prototype-bean fabric
+     * with two-arguments bean constructor
+     * @return function interface for two arguments
+     */
     @Bean
     public FunctionTwoArgs<String, String, WebTask> webTaskFactory() {
         return this::webTaskWithParam;

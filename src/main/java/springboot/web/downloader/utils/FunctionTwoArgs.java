@@ -5,7 +5,6 @@ public interface FunctionTwoArgs<T, S, R> {
 
     /**
      * Applies this function to the given argument.
-     *
      * @param t firs function argument
      * @param s second function argument
      * @return the function result

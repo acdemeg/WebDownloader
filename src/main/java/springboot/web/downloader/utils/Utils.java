@@ -40,7 +40,7 @@ public final class Utils {
     }
 
     /**
-     * Method extract log info from wget-log file and write it in application logs
+     * Method extract log-info from wget-log file and write it in application logs
      * @param dir to point on site location folder
      */
     public static void wgetLogging(String dir) throws IOException {

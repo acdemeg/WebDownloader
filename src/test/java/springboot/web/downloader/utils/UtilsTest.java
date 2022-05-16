@@ -5,11 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
+
 @SpringBootTest
 class UtilsTest {
 
     @Test
-    void runProcess() {
+    void runProcess() throws IOException, InterruptedException {
+        int exitSuccess = Utils.runProcess("ls", "ls", System.getProperty("user.home"));
+        Assertions.assertEquals(0, exitSuccess);
+        int exitError = Utils.runProcess("ls -something", "ls", System.getProperty("user.home"));
+        Assertions.assertNotEquals(0, exitError);
     }
 
     @Test

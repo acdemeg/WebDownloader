@@ -3,7 +3,9 @@ package springboot.web.downloader.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import springboot.web.downloader.WebDownloader;
 
 import java.io.File;
@@ -71,5 +73,19 @@ public final class Utils {
         int exitCode = process.waitFor();
         log.info("Exit code: " + exitCode);
         return exitCode;
+    }
+
+    /**
+     * This method performs check of availability remote web-resource
+     * @param URI remote resource identifier
+     * @return test connection info
+     */
+    public ResponseEntity<?> isLiveConnection(final String URI){
+        try {
+            return new RestTemplate().getForEntity(URI, String.class);
+        }
+        catch (Exception ex){
+            return ResponseUtils.badRequest(ex);
+        }
     }
 }

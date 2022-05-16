@@ -1,6 +1,6 @@
 package springboot.web.downloader.registory;
 
-import springboot.web.downloader.task.StatusTask;
+import springboot.web.downloader.enums.StatusTask;
 
 import java.util.HashMap;
 import java.util.Map;

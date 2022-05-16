@@ -1,4 +1,4 @@
-package springboot.web.downloader.task;
+package springboot.web.downloader.enums;
 
 /**
  * This class represent statuses set which

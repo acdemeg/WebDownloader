@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import springboot.web.downloader.TestUtils;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.registory.TaskRegistry;
-import springboot.web.downloader.task.StatusTask;
+import springboot.web.downloader.enums.StatusTask;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

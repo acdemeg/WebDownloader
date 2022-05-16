@@ -33,13 +33,13 @@ public class Rest {
     @GetMapping(path = "/estimate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> estimateSize(){
         return ResponseEntity.ok()
-                .body(null);
+                .body("ok");
     }
 
     @GetMapping(path = "/map", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> mapSite(){
         return ResponseEntity.ok()
-                .body(null);
+                .body("ok");
     }
 
 }

@@ -1,6 +1,7 @@
 package springboot.web.downloader.task;
 
 import springboot.web.downloader.WebDownloader;
+import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
@@ -28,11 +29,13 @@ public class WebTask implements Callable<StatusTask> {
 
     @Override
     public StatusTask call() throws Exception {
+        int exitCode = 1;
         String dir = WebDownloader.baseSites + taskId;
         utils.createDirectory(dir);
-        int exitWget = wget.download(URI, dir);
+        if(wget.download(URI, dir) == 0){
+            exitCode = zip.wrapToZip(taskId);
+        }
         utils.wgetLogging(dir);
-        int exitZip = zip.wrapToZip(taskId);
-        return (exitWget == 0 && exitZip == 0) ? StatusTask.DONE : StatusTask.ERROR;
+        return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 }

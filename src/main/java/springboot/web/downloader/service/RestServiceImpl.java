@@ -11,6 +11,7 @@ import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionTwoArgs;
+import springboot.web.downloader.utils.ResponseUtils;
 import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
@@ -33,6 +34,9 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<?> requireDownload(final String URI) {
+        var response = Utils.isLiveConnection(URI);
+        if(response.getStatusCode().isError())
+            return response;
         String taskId = UUID.randomUUID().toString();
         final var exec = Executors.newSingleThreadExecutor();
         final var future = exec.submit(webTaskFactory.apply(taskId, URI));
@@ -43,25 +47,37 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<?> estimateSize(String URI) {
+        var response = Utils.isLiveConnection(URI);
+        if(response.getStatusCode().isError())
+            return response;
         String taskId = UUID.randomUUID().toString();
         return ResponseEntity.ok().body(taskId);
     }
 
     @Override
     public ResponseEntity<?> mapSite(String URI) {
+        var response = Utils.isLiveConnection(URI);
+        if(response.getStatusCode().isError())
+            return response;
         String taskId = UUID.randomUUID().toString();
         return ResponseEntity.ok().body(taskId);
     }
 
     @Override
-    public ResponseEntity<?> getZip(String taskId) throws FileNotFoundException {
-        var zip = new File(WebDownloader.baseArchived + taskId + ".zip");
-        long length = FileUtils.sizeOf(zip);
-        Resource resource = new InputStreamResource(new FileInputStream(zip));
-        return ResponseEntity.ok()
-                .header(CONTENT_DISPOSITION, "attachment;filename=site.zip")
-                .contentType(MediaType.valueOf("application/zip"))
-                .contentLength(length)
-                .body(resource);
+    public ResponseEntity<?> getZip(String taskId) {
+        try {
+            String path = WebDownloader.baseArchived + taskId + ".zip";
+            var zip = new File(path);
+            Resource resource = new InputStreamResource(new FileInputStream(zip));
+            long length = FileUtils.sizeOf(zip);
+            return ResponseEntity.ok()
+                    .header(CONTENT_DISPOSITION, "attachment;filename=site.zip")
+                    .contentType(MediaType.valueOf("application/zip"))
+                    .contentLength(length)
+                    .body(resource);
+        }
+        catch (FileNotFoundException ex){
+            return ResponseUtils.notFound("Not found zip-file for taskId: " + taskId);
+        }
     }
 }

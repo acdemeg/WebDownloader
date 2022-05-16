@@ -2,8 +2,6 @@ package springboot.web.downloader.service;
 
 import org.springframework.http.ResponseEntity;
 
-import java.io.FileNotFoundException;
-
 /**
  * This class provides common rest interface for
  * clients request and is entry point for run
@@ -39,7 +37,6 @@ public interface RestService {
      *
      * @param taskId string which is also .zip-file name
      * @return zip file as resource
-     * @throws FileNotFoundException if zip file not found
      */
-    ResponseEntity<?> getZip(String taskId) throws FileNotFoundException;
+    ResponseEntity<?> getZip(String taskId);
 }

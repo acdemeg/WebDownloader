@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class ResponseUtils {
 
-    public static ResponseEntity<?> badRequest(final Exception e) {
+    public static ResponseEntity<?> badRequest(final Exception ex) {
         return new ResponseEntity<>(
-                new ErrorStruct(HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage()),
+                new ErrorStruct(HttpStatus.BAD_REQUEST.value(), ex.getLocalizedMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 

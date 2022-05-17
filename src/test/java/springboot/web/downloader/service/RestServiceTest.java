@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.TestUtils;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.enums.ErrorStruct;
@@ -17,6 +18,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -71,73 +73,60 @@ class RestServiceTest {
 
     @Test
     void getZipError() {
-        final var response = this.restService.getZip("XXX-VVV-III");
-        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), errorStruct.getErrorCode());
+        notFoundTest(this.restService::getZip);
     }
 
     @Test
     void statusTaskNotFound() {
-        final var response = this.restService.statusTask("XXX-VVV-III");
+        notFoundTest(this.restService::statusTask);
+    }
+
+    private void notFoundTest(Function<String, ResponseEntity<?>> restMethod){
+        final var response = restMethod.apply("XXX-VVV-III");
         ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), errorStruct.getErrorCode());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void statusTaskRunning() {
-        final String task = UUID.randomUUID().toString();
-        Future<StatusTask> mockFuture = Mockito.mock(Future.class);
-        Mockito.when(mockFuture.isDone()).thenReturn(false);
-        TaskRegistry.registry.put(task, mockFuture);
-
-        var response = restService.statusTask(task);
+    void statusTaskRunning() throws ExecutionException, InterruptedException {
+        var response = statusTaskTest(false, null, false);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(StatusTask.RUNNING, response.getBody());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void statusTaskError() throws ExecutionException, InterruptedException {
-        final String task = UUID.randomUUID().toString();
-        Future<StatusTask> mockFuture = Mockito.mock(Future.class);
-        Mockito.when(mockFuture.isDone()).thenReturn(true);
-        Mockito.when(mockFuture.get()).thenReturn(StatusTask.ERROR);
-        TaskRegistry.registry.put(task, mockFuture);
-
-        var response = restService.statusTask(task);
+        var response = statusTaskTest(true, StatusTask.ERROR, false);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         Assertions.assertEquals(StatusTask.ERROR, response.getBody());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void statusTaskDone() throws ExecutionException, InterruptedException {
-        final String task = UUID.randomUUID().toString();
-        Future<StatusTask> mockFuture = Mockito.mock(Future.class);
-        Mockito.when(mockFuture.isDone()).thenReturn(true);
-        Mockito.when(mockFuture.get()).thenReturn(StatusTask.DONE);
-        TaskRegistry.registry.put(task, mockFuture);
-
-        var response = restService.statusTask(task);
+        var response = statusTaskTest(true, StatusTask.DONE, false);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(StatusTask.DONE, response.getBody());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void statusTaskUndefined() throws ExecutionException, InterruptedException {
-        final String task = UUID.randomUUID().toString();
-        Future<StatusTask> mockFuture = Mockito.mock(Future.class);
-        Mockito.when(mockFuture.isDone()).thenReturn(true);
-        Mockito.when(mockFuture.get()).thenThrow(ExecutionException.class);
-        TaskRegistry.registry.put(task, mockFuture);
-
-        var response = restService.statusTask(task);
+        var response = statusTaskTest(true, StatusTask.DONE, true);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         Assertions.assertEquals(StatusTask.UNDEFINED, response.getBody());
+    }
+
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<?> statusTaskTest(boolean isDone, StatusTask statusTask, boolean isThrowable)
+            throws ExecutionException, InterruptedException {
+        final String task = UUID.randomUUID().toString();
+        Future<StatusTask> mockFuture = Mockito.mock(Future.class);
+        Mockito.when(mockFuture.isDone()).thenReturn(isDone);
+        if(isThrowable)
+            Mockito.when(mockFuture.get()).thenThrow(ExecutionException.class);
+        else Mockito.when(mockFuture.get()).thenReturn(statusTask);
+        TaskRegistry.registry.put(task, mockFuture);
+        return restService.statusTask(task);
     }
 
 }

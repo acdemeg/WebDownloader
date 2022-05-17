@@ -5,5 +5,5 @@ package springboot.web.downloader.enums;
  * could be assigned on Task
  */
 public enum StatusTask {
-    DONE, ERROR
+    DONE, ERROR, RUNNING, UNDEFINED
 }

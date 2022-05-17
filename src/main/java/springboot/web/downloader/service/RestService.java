@@ -34,9 +34,15 @@ public interface RestService {
 
     /**
      * This method allow download zip archive as octet-stream
-     *
      * @param taskId string which is also .zip-file name
      * @return zip file as resource
      */
     ResponseEntity<?> getZip(final String taskId);
+
+    /**
+     * This method allow monitoring status web-task
+     * @param taskId task identifier received from client
+     * @return status task (DONE, ERROR, RUNNING, UNDEFINED)
+     */
+    ResponseEntity<?> statusTask(final String taskId);
 }

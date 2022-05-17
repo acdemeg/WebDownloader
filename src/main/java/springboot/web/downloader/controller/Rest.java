@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springboot.web.downloader.service.RestService;
 
-import java.io.IOException;
-
 @Slf4j
 @RestController
 public class Rest {
@@ -23,6 +21,11 @@ public class Rest {
     @GetMapping(path = "/zip", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<?> getZip(@RequestParam(value = "taskId") final String taskId){
         return this.restService.getZip(taskId);
+    }
+
+    @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> statusTask(@RequestParam(value = "taskId") final String taskId){
+        return this.restService.statusTask(taskId);
     }
 
     @GetMapping(path = "/require", produces = MediaType.APPLICATION_JSON_VALUE)

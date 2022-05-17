@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.annotations.CheckUriConnection;
+import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionTwoArgs;
@@ -17,6 +18,7 @@ import springboot.web.downloader.utils.ResponseUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
@@ -72,6 +74,24 @@ public class RestServiceImpl implements RestService {
         }
         catch (FileNotFoundException ex){
             return ResponseUtils.notFound("Not found zip-file for taskId: " + taskId);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> statusTask(final String taskId) {
+        try {
+            var future = TaskRegistry.registry.get(taskId);
+            if(Objects.isNull(future))
+                return ResponseUtils.notFound("Task with id: " + taskId + " not found");
+            if(!future.isDone())
+                return ResponseEntity.ok().body(StatusTask.RUNNING);
+            var result = future.get();
+            if(result.equals(StatusTask.ERROR))
+                return ResponseEntity.internalServerError().body(StatusTask.ERROR);
+            return ResponseEntity.ok().body(StatusTask.DONE);
+        }
+        catch (Exception ex){
+            return ResponseEntity.internalServerError().body(StatusTask.UNDEFINED);
         }
     }
 }

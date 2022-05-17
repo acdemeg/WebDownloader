@@ -12,7 +12,7 @@ import java.io.IOException;
 public class ZipImpl implements Zip {
 
     @Override
-    public int wrapToZip(String siteFolder) throws IOException, InterruptedException {
+    public int wrapToZip(final String siteFolder) throws IOException, InterruptedException {
         String siteZip = siteFolder + ".zip";
         String zip = "zip -9 -r " + siteZip + " " + siteFolder;
         String mv = " && mv " + siteZip + " ../archived";

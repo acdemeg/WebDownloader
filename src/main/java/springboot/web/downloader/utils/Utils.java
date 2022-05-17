@@ -34,7 +34,7 @@ public final class Utils {
      * @param process referred to running shell native process
      * @param processName conditional internal process name
      */
-    public static void logProcess(Process process, String processName) throws IOException {
+    public static void logProcess(final Process process, final String processName) throws IOException {
         log.info(processName);
         log.info(IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8));
     }
@@ -43,7 +43,7 @@ public final class Utils {
      * Method extract log-info from wget-log file and write it in application logs
      * @param dir to point on site location folder
      */
-    public static void wgetLogging(String dir) throws IOException {
+    public static void wgetLogging(final String dir) throws IOException {
         File file = new File(dir + "/wget-log");
         final var lines = FileUtils.readLines(file, "UTF-8");
         log.info(String.join("\n", lines));
@@ -53,7 +53,7 @@ public final class Utils {
      * Common method for creation new directory
      * @param dir path to new folder
      */
-    public static void createDirectory(String dir) throws IOException {
+    public static void createDirectory(final String dir) throws IOException {
         FileUtils.forceMkdir(new File(dir));
     }
 
@@ -64,7 +64,8 @@ public final class Utils {
      * @param workDir working directory for run process
      * @return exit code shell-utility
      */
-    public static int runProcess(String command, String processName, String workDir) throws IOException, InterruptedException {
+    public static int runProcess(final String command, final String processName, final String workDir)
+            throws IOException, InterruptedException {
         final var process = new ProcessBuilder("sh", "-c", command)
                 .directory(new File(workDir)).start();
         Utils.logProcess(process, processName + "_Output");

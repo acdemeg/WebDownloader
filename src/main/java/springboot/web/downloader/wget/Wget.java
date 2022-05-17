@@ -18,5 +18,5 @@ public interface Wget {
      * @param dir dest folder for download
      * @return status code shell-command
      */
-    int download(String URI, String dir) throws ExecutionException, InterruptedException, IOException;
+    int download(final String URI, final String dir) throws ExecutionException, InterruptedException, IOException;
 }

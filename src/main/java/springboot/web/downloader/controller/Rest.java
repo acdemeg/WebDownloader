@@ -16,7 +16,7 @@ public class Rest {
 
     private final RestService restService;
 
-    public Rest(RestService restService) {
+    public Rest(final RestService restService) {
         this.restService = restService;
     }
 

@@ -14,7 +14,7 @@ public interface RestService {
      * @param URI is root web-link which came from client
      * @return taskId if URI is available else {@code ErrorStruct}
      */
-    ResponseEntity<?> requireDownload(String URI);
+    ResponseEntity<?> requireDownload(final String URI);
 
     /**
      * Method performs estimate web-resource size (only
@@ -22,7 +22,7 @@ public interface RestService {
      * @param URI is root web-link which came from client
      * @return taskId if URI is available else {@code ErrorStruct}
      */
-    ResponseEntity<?> estimateSize(String URI);
+    ResponseEntity<?> estimateSize(final String URI);
 
     /**
      * This method pick up all links on site and build map of site
@@ -30,7 +30,7 @@ public interface RestService {
      * @param URI is root web-link which came from client
      * @return taskId if URI is available else {@code ErrorStruct}
      */
-    ResponseEntity<?> mapSite(String URI);
+    ResponseEntity<?> mapSite(final String URI);
 
     /**
      * This method allow download zip archive as octet-stream
@@ -38,5 +38,5 @@ public interface RestService {
      * @param taskId string which is also .zip-file name
      * @return zip file as resource
      */
-    ResponseEntity<?> getZip(String taskId);
+    ResponseEntity<?> getZip(final String taskId);
 }

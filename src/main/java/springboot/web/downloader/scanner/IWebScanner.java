@@ -8,7 +8,7 @@ import java.util.TreeMap;
  */
 public interface IWebScanner {
 
-    TreeMap<String, Object> toBuildSiteTreeMap(String root);
+    TreeMap<String, Object> toBuildSiteTreeMap(final String root);
 
-    boolean validateRootLink(String root);
+    boolean validateRootLink(final String root);
 }

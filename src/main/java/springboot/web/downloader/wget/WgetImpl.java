@@ -19,7 +19,7 @@ public class WgetImpl implements Wget {
     }
 
     @Override
-    public int download(String URI, String dir) throws InterruptedException, IOException {
+    public int download(final String URI, final String dir) throws InterruptedException, IOException {
         String command = wgetOptions.getWget() + URI;
         return Utils.runProcess(command, "WGET", dir);
     }

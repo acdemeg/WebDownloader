@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionTwoArgs;
@@ -18,6 +19,7 @@ import springboot.web.downloader.zip.Zip;
  */
 @Slf4j
 @Configuration
+@EnableAspectJAutoProxy
 public class Config {
 
     private final Wget wget;

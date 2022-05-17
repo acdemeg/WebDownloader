@@ -8,11 +8,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
+import springboot.web.downloader.annotations.CheckUriConnection;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionTwoArgs;
 import springboot.web.downloader.utils.ResponseUtils;
-import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +33,8 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
+    @CheckUriConnection
     public ResponseEntity<?> requireDownload(final String URI) {
-        var response = Utils.isLiveConnection(URI);
-        if(response.getStatusCode().isError())
-            return response;
         String taskId = UUID.randomUUID().toString();
         final var exec = Executors.newSingleThreadExecutor();
         final var future = exec.submit(webTaskFactory.apply(taskId, URI));
@@ -46,25 +44,21 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public ResponseEntity<?> estimateSize(String URI) {
-        var response = Utils.isLiveConnection(URI);
-        if(response.getStatusCode().isError())
-            return response;
+    @CheckUriConnection
+    public ResponseEntity<?> estimateSize(final String URI) {
         String taskId = UUID.randomUUID().toString();
         return ResponseEntity.ok().body(taskId);
     }
 
     @Override
-    public ResponseEntity<?> mapSite(String URI) {
-        var response = Utils.isLiveConnection(URI);
-        if(response.getStatusCode().isError())
-            return response;
+    @CheckUriConnection
+    public ResponseEntity<?> mapSite(final String URI) {
         String taskId = UUID.randomUUID().toString();
         return ResponseEntity.ok().body(taskId);
     }
 
     @Override
-    public ResponseEntity<?> getZip(String taskId) {
+    public ResponseEntity<?> getZip(final String taskId) {
         try {
             String path = WebDownloader.baseArchived + taskId + ".zip";
             var zip = new File(path);

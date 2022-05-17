@@ -15,5 +15,5 @@ public interface Zip {
      * @param siteFolder name site location folder
      * @return status code shell-command
      */
-    int wrapToZip(String siteFolder) throws IOException, InterruptedException;
+    int wrapToZip(final String siteFolder) throws IOException, InterruptedException;
 }

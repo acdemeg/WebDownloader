@@ -12,7 +12,11 @@ import java.util.concurrent.Callable;
  * This class is abstract task created after client request
  * which must be processed in separate thread.
  * WebTask have {@code taskId} identifier thought it
- * client able to monitoring WebTask status
+ * client able to monitoring WebTask status.
+ * WebTask is Prototype bean and creation new way in {@code Config.class}
+ * {<code>
+ *     public FunctionTwoArgs<String, String, WebTask> webTaskFactory()
+ * </code>}
  */
 public class WebTask implements Callable<StatusTask> {
 

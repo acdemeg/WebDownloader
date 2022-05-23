@@ -48,13 +48,7 @@ class RestServiceTest {
     @Test
     @Order(1)
     void requireDownloadSuccess() throws InterruptedException, ExecutionException {
-        final var response = this.restService.requireDownload(successUrl);
-        taskId = Objects.requireNonNull(response.getBody()).toString();
-        final var future = TaskRegistry.registry.get(taskId);
-        StatusTask statusTask = future.get();
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(UUID.fromString(taskId).getClass(), UUID.class);
-        Assertions.assertEquals(StatusTask.DONE, statusTask);
+        queryWithClientUrlSuccess(this.restService::requireDownload);
     }
 
     @Test
@@ -72,10 +66,7 @@ class RestServiceTest {
 
     @Test
     void requireDownloadError() {
-        final var response = this.restService.requireDownload(errorUrl);
-        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorStruct.getErrorCode());
+        queryWithClientUrlError(this.restService::requireDownload);
     }
 
     @Test
@@ -129,6 +120,34 @@ class RestServiceTest {
         else Mockito.when(mockFuture.get()).thenReturn(statusTask);
         TaskRegistry.registry.put(task, mockFuture);
         return restService.statusTask(task);
+    }
+
+    @Test
+    void estimateSizeSuccess() throws InterruptedException, ExecutionException {
+        queryWithClientUrlSuccess(this.restService::estimateSize);
+    }
+
+    @Test
+    void estimateSizeError() {
+        queryWithClientUrlError(this.restService::estimateSize);
+    }
+
+    private void queryWithClientUrlSuccess(Function<String, ResponseEntity<?>> rest)
+            throws InterruptedException, ExecutionException {
+        final var response = rest.apply(successUrl);
+        taskId = Objects.requireNonNull(response.getBody()).toString();
+        final var future = TaskRegistry.registry.get(taskId);
+        StatusTask statusTask = future.get();
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(UUID.fromString(taskId).getClass(), UUID.class);
+        Assertions.assertEquals(StatusTask.DONE, statusTask);
+    }
+
+    private void queryWithClientUrlError(Function<String, ResponseEntity<?>> rest) {
+        final var response = rest.apply(errorUrl);
+        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorStruct.getErrorCode());
     }
 
 }

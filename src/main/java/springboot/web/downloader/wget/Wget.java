@@ -19,4 +19,14 @@ public interface Wget {
      * @return status code shell-command
      */
     int download(final String URI, final String dir) throws ExecutionException, InterruptedException, IOException;
+
+    /**
+     * This method perform run shell-utility 'wget'
+     * in spider mode for approximately estimate size web-resource
+     * Method not create none local files and directories except wget-log
+     *
+     * @param URI root link web-resource
+     * @return status code shell-command
+     */
+    int estimate(String URI) throws IOException, InterruptedException;
 }

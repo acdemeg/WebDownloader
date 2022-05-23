@@ -24,6 +24,8 @@ import java.util.function.Function;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RestServiceTest {
 
+    private final String successUrl = "https://locallhost.com/";
+    private final String errorUrl = "https://unreacheble-XXX-url.guru/";
     private final RestService restService;
     private static String taskId;
 
@@ -46,7 +48,7 @@ class RestServiceTest {
     @Test
     @Order(1)
     void requireDownloadSuccess() throws InterruptedException, ExecutionException {
-        final var response = this.restService.requireDownload("https://locallhost.com/");
+        final var response = this.restService.requireDownload(successUrl);
         taskId = Objects.requireNonNull(response.getBody()).toString();
         final var future = TaskRegistry.registry.get(taskId);
         StatusTask statusTask = future.get();
@@ -64,16 +66,16 @@ class RestServiceTest {
     }
 
     @Test
-    void requireDownloadError() {
-        final var response = this.restService.requireDownload("https://unreacheble-XXX-url.guru/");
-        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorStruct.getErrorCode());
+    void getZipError() {
+        notFoundTest(this.restService::getZip);
     }
 
     @Test
-    void getZipError() {
-        notFoundTest(this.restService::getZip);
+    void requireDownloadError() {
+        final var response = this.restService.requireDownload(errorUrl);
+        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorStruct.getErrorCode());
     }
 
     @Test

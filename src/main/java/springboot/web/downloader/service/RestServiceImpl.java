@@ -10,9 +10,10 @@ import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.annotations.CheckUriConnection;
 import springboot.web.downloader.enums.StatusTask;
+import springboot.web.downloader.enums.TypeTask;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
-import springboot.web.downloader.utils.FunctionTwoArgs;
+import springboot.web.downloader.utils.FunctionManyArgs;
 import springboot.web.downloader.utils.ResponseUtils;
 
 import java.io.File;
@@ -27,28 +28,31 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 @Service
 public class RestServiceImpl implements RestService {
 
-    private final FunctionTwoArgs<String, String, WebTask> webTaskFactory;
+    private final FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory;
 
     @Autowired
-    public RestServiceImpl(FunctionTwoArgs<String, String, WebTask> webTaskFactory) {
+    public RestServiceImpl(FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory) {
         this.webTaskFactory = webTaskFactory;
     }
 
     @Override
     @CheckUriConnection
     public ResponseEntity<?> requireDownload(final String URI) {
-        String taskId = UUID.randomUUID().toString();
-        final var exec = Executors.newSingleThreadExecutor();
-        final var future = exec.submit(webTaskFactory.apply(taskId, URI));
-        TaskRegistry.registry.put(taskId, future);
-        exec.shutdown();
-        return ResponseEntity.ok().body(taskId);
+        return runWebTask(URI, TypeTask.DOWNLOAD);
     }
 
     @Override
     @CheckUriConnection
     public ResponseEntity<?> estimateSize(final String URI) {
+        return runWebTask(URI, TypeTask.ESTIMATE);
+    }
+
+    private ResponseEntity<String> runWebTask(String URI, TypeTask estimate) {
         String taskId = UUID.randomUUID().toString();
+        final var exec = Executors.newSingleThreadExecutor();
+        final var future = exec.submit(webTaskFactory.apply(taskId, URI, estimate));
+        TaskRegistry.registry.put(taskId, future);
+        exec.shutdown();
         return ResponseEntity.ok().body(taskId);
     }
 

@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
+import springboot.web.downloader.enums.TypeTask;
 import springboot.web.downloader.task.WebTask;
-import springboot.web.downloader.utils.FunctionTwoArgs;
+import springboot.web.downloader.utils.FunctionManyArgs;
 import springboot.web.downloader.utils.LoggableHttpTraceRepository;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
@@ -47,13 +48,13 @@ public class Config {
      * @return function interface for two arguments
      */
     @Bean
-    public FunctionTwoArgs<String, String, WebTask> webTaskFactory() {
+    public FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory() {
         return this::webTaskWithParam;
     }
 
     @Bean
     @Scope(value = "prototype")
-    public WebTask webTaskWithParam(String taskId, String URI) {
-        return new WebTask(wget, zip, taskId, URI);
+    public WebTask webTaskWithParam(String taskId, String URI, TypeTask typeTask) {
+        return new WebTask(wget, zip, taskId, URI, typeTask);
     }
 }

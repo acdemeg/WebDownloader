@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public final class WgetOptions {
 
+    private final String level = "1";
+    private final String quoteSize = "10000m";
+
     private final String userAgent = "--user-agent=\"Mozilla/5.0 (X11; Linux x86_64)" +
             " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36\"";
     private final String referer = "--referer=\"https://www.google.com/\"";
@@ -19,10 +22,14 @@ public final class WgetOptions {
     private final String pageRequisites = "--page-requisites";
     private final String htmlExtension = "--html-extension";
     private final String convertLinks = "--convert-links";
-    private final String level = "1";
     private final String backgroundRun = "--background"; //off
     private final String logFile = "--output-file=wget-log";
     private final String mirror = "--recursive --timestamping --level " + level + " --dont-remove-listing";
-    private final String wget = String.format("wget %s %s %s %s %s %s %s %s %s ", userAgent, referer, logFile,
-            ignoreRobotsTxt, noCheckCertificate, pageRequisites, htmlExtension, convertLinks, mirror);
+    private final String spider = " --spider --server-response --no-directories";
+    private final String quota = "--quota=" + quoteSize;
+
+    private final String wgetDownload = String.format("wget %s %s %s %s %s %s %s %s %s %s ", userAgent, referer,
+            logFile, ignoreRobotsTxt, noCheckCertificate, pageRequisites, htmlExtension, convertLinks, mirror, quota);
+    private final String wgetEstimate = String.format("%s %s ", wgetDownload, spider);
+
 }

@@ -4,11 +4,9 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.TestUtils;
-import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.enums.ErrorStruct;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
@@ -24,15 +22,12 @@ import java.util.function.Function;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RestServiceTest {
 
-    private final String successUrl = "https://locallhost.com/";
-    private final String errorUrl = "https://unreacheble-XXX-url.guru/";
     private final RestService restService;
     private static String taskId;
 
     @Autowired
-    RestServiceTest(ConfigurableApplicationContext applicationContext, RestService restService) {
+    RestServiceTest(RestService restService) {
         this.restService = restService;
-        WebDownloader.appContext = applicationContext;
     }
 
     @BeforeAll
@@ -109,9 +104,15 @@ class RestServiceTest {
         Assertions.assertEquals(StatusTask.UNDEFINED, response.getBody());
     }
 
-    @SuppressWarnings("unchecked")
     private ResponseEntity<?> statusTaskTest(boolean isDone, StatusTask statusTask, boolean isThrowable)
             throws ExecutionException, InterruptedException {
+        final String task = this.prepareMockTask(isDone, statusTask, isThrowable);
+        return restService.statusTask(task);
+    }
+
+    @SuppressWarnings("unchecked")
+    private String prepareMockTask(boolean isDone, StatusTask statusTask, boolean isThrowable)
+            throws InterruptedException, ExecutionException {
         final String task = UUID.randomUUID().toString();
         Future<StatusTask> mockFuture = Mockito.mock(Future.class);
         Mockito.when(mockFuture.isDone()).thenReturn(isDone);
@@ -119,12 +120,31 @@ class RestServiceTest {
             Mockito.when(mockFuture.get()).thenThrow(ExecutionException.class);
         else Mockito.when(mockFuture.get()).thenReturn(statusTask);
         TaskRegistry.registry.put(task, mockFuture);
-        return restService.statusTask(task);
+        return task;
     }
 
     @Test
+    @Order(3)
     void estimateSizeSuccess() throws InterruptedException, ExecutionException {
         queryWithClientUrlSuccess(this.restService::estimateSize);
+    }
+
+    @Test
+    @Order(4)
+    void discoverSizeTestSuccess(){
+        var response = this.restService.discoverSize(taskId);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        int size = Integer.parseInt(((String) Objects.requireNonNull(response.getBody())).substring(0,4));
+        Assertions.assertEquals(39, size / 100);
+
+    }
+
+    @Test
+    void discoverSizeTestFileNotFound() throws ExecutionException, InterruptedException {
+        final String task = this.prepareMockTask(true, StatusTask.DONE, false);
+        var response = this.restService.discoverSize(task);
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertEquals("File " + task + " not found", response.getBody());
     }
 
     @Test
@@ -134,6 +154,7 @@ class RestServiceTest {
 
     private void queryWithClientUrlSuccess(Function<String, ResponseEntity<?>> rest)
             throws InterruptedException, ExecutionException {
+        String successUrl = "https://locallhost.com/";
         final var response = rest.apply(successUrl);
         taskId = Objects.requireNonNull(response.getBody()).toString();
         final var future = TaskRegistry.registry.get(taskId);
@@ -144,6 +165,7 @@ class RestServiceTest {
     }
 
     private void queryWithClientUrlError(Function<String, ResponseEntity<?>> rest) {
+        String errorUrl = "https://unreacheble-XXX-url.guru/";
         final var response = rest.apply(errorUrl);
         ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());

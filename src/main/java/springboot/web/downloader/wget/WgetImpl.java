@@ -3,7 +3,6 @@ package springboot.web.downloader.wget;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.utils.Utils;
 
 import java.io.IOException;
@@ -26,9 +25,9 @@ public class WgetImpl implements Wget {
     }
 
     @Override
-    public int estimate(String URI) throws IOException, InterruptedException {
+    public int estimate(final String URI, final String dir) throws IOException, InterruptedException {
         String command = wgetOptions.getWgetEstimate() + URI;
-        return Utils.runProcess(command, "WGET_ESTIMATE", WebDownloader.baseSites);
+        return Utils.runProcess(command, "WGET_ESTIMATE", dir);
     }
 
 }

@@ -15,10 +15,16 @@ import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionManyArgs;
 import springboot.web.downloader.utils.ResponseUtils;
+import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -96,6 +102,33 @@ public class RestServiceImpl implements RestService {
         }
         catch (Exception ex){
             return ResponseEntity.internalServerError().body(StatusTask.UNDEFINED);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> discoverSize(String taskId) {
+        try {
+            ResponseEntity<?> response = this.statusTask(taskId);
+            if(!Objects.equals(response.getBody(), StatusTask.DONE))
+                return response;
+
+            String wgetLog = WebDownloader.baseSites + taskId + "/wget-log";
+            if(Files.notExists(Path.of(wgetLog)))
+                return ResponseEntity.internalServerError().body("File " + taskId + " not found");
+
+            Path sh = Paths.get("./src/main/resources/discover-size.sh").toAbsolutePath();
+            int exitCode = Utils.runProcess(
+                    sh + " " + wgetLog,
+                    "DISCOVER_SIZE", WebDownloader.baseSites + taskId);
+            if(exitCode != 0)
+                return ResponseEntity.internalServerError().body("Exit code: " + exitCode);
+
+            var list = FileUtils.readLines(new File(wgetLog), StandardCharsets.UTF_8);
+            String byteSize = list.get(list.size() - 1);
+            return ResponseEntity.ok().body(byteSize);
+
+        } catch (IOException | InterruptedException ex) {
+            return ResponseEntity.internalServerError().body(ex.getMessage());
         }
     }
 }

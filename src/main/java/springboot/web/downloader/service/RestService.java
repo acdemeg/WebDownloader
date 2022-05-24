@@ -45,4 +45,14 @@ public interface RestService {
      * @return status task (DONE, ERROR, RUNNING, UNDEFINED)
      */
     ResponseEntity<?> statusTask(final String taskId);
+
+    /**
+     * This method allow get approximately size web-resource
+     * if before '/estimate' success complete, else if '/estimate'
+     * running then return {@code StatusTask}, else if
+     * '/estimate' was error return error
+     * @param taskId task identifier received from client
+     * @return approximately size web-resource
+     */
+    ResponseEntity<?> discoverSize(final String taskId);
 }

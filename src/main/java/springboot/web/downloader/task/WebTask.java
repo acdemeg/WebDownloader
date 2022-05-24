@@ -57,7 +57,9 @@ public class WebTask implements Callable<StatusTask> {
     }
 
     private StatusTask estimateSize() throws IOException, InterruptedException {
-        int exitCode = wget.estimate(URI);
+        String dir = WebDownloader.baseSites + taskId;
+        Utils.createDirectory(dir);
+        int exitCode = wget.estimate(URI, dir);
         return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 }

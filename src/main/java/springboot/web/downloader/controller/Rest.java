@@ -25,7 +25,7 @@ public class Rest {
 
     @GetMapping(path = "/size", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> discoverSize(@RequestParam(value = "taskId") final String taskId){
-        return this.restService.discoverSize(taskId);
+        return this.restService.getSize(taskId);
     }
 
     @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)

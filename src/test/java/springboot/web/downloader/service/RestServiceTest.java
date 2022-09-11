@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.TestUtils;
-import springboot.web.downloader.enums.ErrorStruct;
+import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
 
@@ -55,6 +55,7 @@ class RestServiceTest {
     }
 
     @Test
+    @Order(3)
     void getZipError() {
         notFoundTest(this.restService::getZip);
     }
@@ -71,40 +72,40 @@ class RestServiceTest {
 
     private void notFoundTest(Function<String, ResponseEntity<?>> restMethod){
         final var response = restMethod.apply("XXX-VVV-III");
-        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
+        ResponseDto responseDto = Objects.requireNonNull((ResponseDto) response.getBody());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), errorStruct.getErrorCode());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), responseDto.getStatusCode());
     }
 
     @Test
     void statusTaskRunning() throws ExecutionException, InterruptedException {
         var response = statusTaskTest(false, null, false);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(StatusTask.RUNNING, response.getBody());
+        Assertions.assertEquals(StatusTask.RUNNING.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
     void statusTaskError() throws ExecutionException, InterruptedException {
         var response = statusTaskTest(true, StatusTask.ERROR, false);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        Assertions.assertEquals(StatusTask.ERROR, response.getBody());
+        Assertions.assertEquals(StatusTask.ERROR.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
     void statusTaskDone() throws ExecutionException, InterruptedException {
         var response = statusTaskTest(true, StatusTask.DONE, false);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(StatusTask.DONE, response.getBody());
+        Assertions.assertEquals(StatusTask.DONE.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
     void statusTaskUndefined() throws ExecutionException, InterruptedException {
         var response = statusTaskTest(true, StatusTask.DONE, true);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        Assertions.assertEquals(StatusTask.UNDEFINED, response.getBody());
+        Assertions.assertEquals(StatusTask.UNDEFINED.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
-    private ResponseEntity<?> statusTaskTest(boolean isDone, StatusTask statusTask, boolean isThrowable)
+    private ResponseEntity<ResponseDto> statusTaskTest(boolean isDone, StatusTask statusTask, boolean isThrowable)
             throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(isDone, statusTask, isThrowable);
         return restService.statusTask(task);
@@ -124,17 +125,18 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void estimateSizeSuccess() throws InterruptedException, ExecutionException {
         queryWithClientUrlSuccess(this.restService::estimateSize);
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void discoverSizeTestSuccess(){
-        var response = this.restService.discoverSize(taskId);
+        var response = this.restService.getSize(taskId);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        int size = Integer.parseInt(((String) Objects.requireNonNull(response.getBody())).substring(0,4));
+        int size = Integer.parseInt(Objects.requireNonNull(
+                Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
         Assertions.assertEquals(39, size / 100);
 
     }
@@ -142,9 +144,9 @@ class RestServiceTest {
     @Test
     void discoverSizeTestFileNotFound() throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(true, StatusTask.DONE, false);
-        var response = this.restService.discoverSize(task);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        Assertions.assertEquals("File " + task + " not found", response.getBody());
+        var response = this.restService.getSize(task);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals("File " + task + " not found", Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
@@ -152,11 +154,11 @@ class RestServiceTest {
         queryWithClientUrlError(this.restService::estimateSize);
     }
 
-    private void queryWithClientUrlSuccess(Function<String, ResponseEntity<?>> rest)
+    private void queryWithClientUrlSuccess(Function<String, ResponseEntity<ResponseDto>> rest)
             throws InterruptedException, ExecutionException {
         String successUrl = "https://locallhost.com/";
         final var response = rest.apply(successUrl);
-        taskId = Objects.requireNonNull(response.getBody()).toString();
+        taskId = Objects.requireNonNull(Objects.requireNonNull(response.getBody()).getResult());
         final var future = TaskRegistry.registry.get(taskId);
         StatusTask statusTask = future.get();
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -167,9 +169,9 @@ class RestServiceTest {
     private void queryWithClientUrlError(Function<String, ResponseEntity<?>> rest) {
         String errorUrl = "https://unreacheble-XXX-url.guru/";
         final var response = rest.apply(errorUrl);
-        ErrorStruct errorStruct = Objects.requireNonNull((ErrorStruct) response.getBody());
+        ResponseDto responseDto = Objects.requireNonNull((ResponseDto) response.getBody());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorStruct.getErrorCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), responseDto.getStatusCode());
     }
 
 }

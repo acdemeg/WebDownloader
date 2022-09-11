@@ -1,6 +1,7 @@
 package springboot.web.downloader.service;
 
 import org.springframework.http.ResponseEntity;
+import springboot.web.downloader.dto.ResponseDto;
 
 /**
  * This class provides common rest interface for
@@ -14,7 +15,7 @@ public interface RestService {
      * @param URI is root web-link which came from client
      * @return taskId if URI is available else {@code ErrorStruct}
      */
-    ResponseEntity<?> requireDownload(final String URI);
+    ResponseEntity<ResponseDto> requireDownload(final String URI);
 
     /**
      * Method performs estimate web-resource size (only
@@ -22,7 +23,7 @@ public interface RestService {
      * @param URI is root web-link which came from client
      * @return taskId if URI is available else {@code ErrorStruct}
      */
-    ResponseEntity<?> estimateSize(final String URI);
+    ResponseEntity<ResponseDto> estimateSize(final String URI);
 
     /**
      * This method pick up all links on site and build map of site
@@ -30,7 +31,7 @@ public interface RestService {
      * @param URI is root web-link which came from client
      * @return taskId if URI is available else {@code ErrorStruct}
      */
-    ResponseEntity<?> mapSite(final String URI);
+    ResponseEntity<ResponseDto> mapSite(final String URI);
 
     /**
      * This method allow download zip archive as octet-stream
@@ -44,7 +45,7 @@ public interface RestService {
      * @param taskId task identifier received from client
      * @return status task (DONE, ERROR, RUNNING, UNDEFINED)
      */
-    ResponseEntity<?> statusTask(final String taskId);
+    ResponseEntity<ResponseDto> statusTask(final String taskId);
 
     /**
      * This method allow get approximately size web-resource
@@ -54,5 +55,5 @@ public interface RestService {
      * @param taskId task identifier received from client
      * @return approximately size web-resource
      */
-    ResponseEntity<?> discoverSize(final String taskId);
+    ResponseEntity<ResponseDto> getSize(final String taskId);
 }

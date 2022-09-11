@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springboot.web.downloader.enums.TypeTask;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionManyArgs;
@@ -50,6 +52,19 @@ public class Config {
     @Bean
     public FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory() {
         return this::webTaskWithParam;
+    }
+
+    //todo temporary enable for testing purposes
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry
+                    .addMapping("/**")
+                    .allowedOrigins("http://localhost:3000");
+            }
+        };
     }
 
     @Bean

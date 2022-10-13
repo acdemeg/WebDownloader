@@ -10,16 +10,16 @@ public enum StatusTask {
     RUNNING("RUNNING","В ОБРАБОТКЕ"),
     UNDEFINED("UNDEFINED","НЕОПРЕДЕЛЕНО");
 
-    private final String Eng;
-    private final String Rus;
-    public static final String Default = "Eng";
+    private final String eng;
+    private final String rus;
+    public static final String DEFAULT = "Eng";
 
     StatusTask(final String Eng, final String Rus){
-        this.Eng = Eng;
-        this.Rus = Rus;
+        this.eng = Eng;
+        this.rus = Rus;
     }
 
     public String getStatus(final String lang){
-        return (lang.equals("Eng")) ? this.Eng : this.Rus;
+        return (lang.equals("Eng")) ? this.eng : this.rus;
     }
 }

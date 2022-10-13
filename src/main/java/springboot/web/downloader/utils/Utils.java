@@ -18,14 +18,18 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public final class Utils {
 
+    private Utils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Method perform creating folders for 'sites' and 'archived'
      * @throws IOException if occurs error in time creating folders
      * or files with same name already exist
      */
     public static void prepareDirectories() throws IOException {
-        FileUtils.forceMkdir(new File(WebDownloader.baseSites));
-        FileUtils.forceMkdir(new File(WebDownloader.baseArchived));
+        FileUtils.forceMkdir(new File(WebDownloader.BASE_SITES));
+        FileUtils.forceMkdir(new File(WebDownloader.BASE_ARCHIVED));
         log.info("Create sites and archived directories if not exist");
     }
 
@@ -45,7 +49,7 @@ public final class Utils {
      */
     public static void wgetLogging(final String dir) throws IOException {
         File file = new File(dir + "/wget-log");
-        final var lines = FileUtils.readLines(file, "UTF-8");
+        final var lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
         log.info(String.join("\n", lines));
     }
 

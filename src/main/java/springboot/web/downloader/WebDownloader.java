@@ -12,8 +12,8 @@ import java.io.IOException;
 @SpringBootApplication
 public class WebDownloader {
 
-	public final static String baseSites = System.getProperty("user.home") + "/sites/";
-	public final static String baseArchived = System.getProperty("user.home") + "/archived/";
+	public static final String BASE_SITES = System.getProperty("user.home") + "/sites/";
+	public static final String BASE_ARCHIVED = System.getProperty("user.home") + "/archived/";
 
 	public static void main(String[] args) throws IOException {
 		SpringApplication.run(WebDownloader.class, args);

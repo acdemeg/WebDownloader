@@ -69,7 +69,7 @@ public class Config {
 
     @Bean
     @Scope(value = "prototype")
-    public WebTask webTaskWithParam(String taskId, String URI, TypeTask typeTask) {
-        return new WebTask(wget, zip, taskId, URI, typeTask);
+    public WebTask webTaskWithParam(String taskId, String uri, TypeTask typeTask) {
+        return new WebTask(wget, zip, taskId, uri, typeTask);
     }
 }

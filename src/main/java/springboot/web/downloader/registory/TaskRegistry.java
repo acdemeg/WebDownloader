@@ -12,5 +12,14 @@ import java.util.concurrent.Future;
  * Registry formed as --> Map<taskId:STRING, taskThread:FUTURE<STRING>>
  */
 public final class TaskRegistry {
-    public static final Map<String, Future<StatusTask>> registry = new ConcurrentHashMap<>();
+
+    private TaskRegistry() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Map<String, Future<StatusTask>> registry = new ConcurrentHashMap<>();
+
+    public static Map<String, Future<StatusTask>> getRegistry(){
+        return registry;
+    }
 }

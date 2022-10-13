@@ -26,14 +26,14 @@ public class WebTask implements Callable<StatusTask> {
     private final Wget wget;
     private final Zip zip;
     private final String taskId;
-    private final String URI;
+    private final String uri;
     private final TypeTask typeTask;
 
-    public WebTask(Wget wget, Zip zip, String taskId, String URI, TypeTask typeTask) {
+    public WebTask(Wget wget, Zip zip, String taskId, String uri, TypeTask typeTask) {
         this.wget = wget;
         this.zip = zip;
         this.taskId = taskId;
-        this.URI = URI;
+        this.uri = uri;
         this.typeTask = typeTask;
     }
 
@@ -47,9 +47,9 @@ public class WebTask implements Callable<StatusTask> {
 
     private StatusTask requireDownload() throws IOException, ExecutionException, InterruptedException {
         int exitCode = 1;
-        String dir = WebDownloader.baseSites + taskId;
+        String dir = WebDownloader.BASE_SITES + taskId;
         Utils.createDirectory(dir);
-        if(wget.download(URI, dir) == 0){
+        if(wget.download(uri, dir) == 0){
             exitCode = zip.wrapToZip(taskId);
         }
         Utils.wgetLogging(dir);
@@ -57,9 +57,9 @@ public class WebTask implements Callable<StatusTask> {
     }
 
     private StatusTask estimateSize() throws IOException, InterruptedException {
-        String dir = WebDownloader.baseSites + taskId;
+        String dir = WebDownloader.BASE_SITES + taskId;
         Utils.createDirectory(dir);
-        int exitCode = wget.estimate(URI, dir);
+        int exitCode = wget.estimate(uri, dir);
         return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 }

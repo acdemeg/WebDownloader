@@ -6,6 +6,10 @@ import springboot.web.downloader.dto.ResponseDto;
 
 public class ResponseUtils {
 
+    private ResponseUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static ResponseEntity<ResponseDto> badRequest(final Exception ex) {
         return new ResponseEntity<>(
                 new ResponseDto(HttpStatus.BAD_REQUEST.value(), ex.getLocalizedMessage()),

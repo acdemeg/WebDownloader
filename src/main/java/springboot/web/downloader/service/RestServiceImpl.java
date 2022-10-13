@@ -62,7 +62,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public ResponseEntity<ResponseDto> statusTask(final String taskId, final String lang) {
         try {
-            var future = TaskRegistry.registry.get(taskId);
+            var future = TaskRegistry.getRegistry().get(taskId);
             if(Objects.isNull(future))
                 return ResponseUtils.notFound("Task with id: " + taskId + " not found");
             if(!future.isDone())
@@ -73,6 +73,7 @@ public class RestServiceImpl implements RestService {
             return ResponseUtils.ok(StatusTask.DONE.getStatus(lang));
         }
         catch (Exception ex){
+            Thread.currentThread().interrupt();
             return ResponseUtils.internalServerError(StatusTask.UNDEFINED.getStatus(lang));
         }
     }
@@ -88,7 +89,7 @@ public class RestServiceImpl implements RestService {
             if(!Objects.equals(Objects.requireNonNull(response.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
                 return response;
 
-            String path = WebDownloader.baseArchived + taskId + ".zip";
+            String path = WebDownloader.BASE_ARCHIVED + taskId + ".zip";
             var zip = new File(path);
             Path zipPath = Paths.get(zip.getAbsolutePath());
             Resource resource = new ByteArrayResource(Files.readAllBytes(zipPath));
@@ -111,14 +112,14 @@ public class RestServiceImpl implements RestService {
             if (!res.getStatusCode().is2xxSuccessful())
                 return res;
 
-            String wgetLog = WebDownloader.baseSites + taskId + "/wget-log";
+            String wgetLog = WebDownloader.BASE_SITES + taskId + "/wget-log";
             if(Files.notExists(Path.of(wgetLog)))
                 return ResponseUtils.notFound("File " + taskId + " not found");
 
             Path sh = Paths.get("./src/main/resources/discover-size.sh").toAbsolutePath();
             int exitCode = Utils.runProcess(
                     sh + " " + wgetLog,
-                    "DISCOVER_SIZE", WebDownloader.baseSites + taskId);
+                    "DISCOVER_SIZE", WebDownloader.BASE_SITES + taskId);
             if(exitCode != 0)
                 return ResponseUtils.internalServerError("Exit code: " + exitCode);
 
@@ -127,6 +128,7 @@ public class RestServiceImpl implements RestService {
             return ResponseUtils.ok(byteSize);
 
         } catch (IOException | InterruptedException ex) {
+            Thread.currentThread().interrupt();
             return ResponseUtils.internalServerError(ex.getMessage());
         }
     }
@@ -147,7 +149,7 @@ public class RestServiceImpl implements RestService {
         String taskId = UUID.randomUUID().toString();
         final var exec = Executors.newSingleThreadExecutor();
         final var future = exec.submit(webTaskFactory.apply(taskId, URI, estimate));
-        TaskRegistry.registry.put(taskId, future);
+        TaskRegistry.getRegistry().put(taskId, future);
         exec.shutdown();
         return ResponseUtils.ok(taskId);
     }

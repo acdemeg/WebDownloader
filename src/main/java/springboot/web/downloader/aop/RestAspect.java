@@ -21,8 +21,8 @@ public class RestAspect {
      */
     @Around(" @annotation(springboot.web.downloader.annotations.CheckUriConnection)")
     public Object checkUriConnectionImpl(final ProceedingJoinPoint pjp) throws Throwable {
-        var URI = (String) pjp.getArgs()[0];
-        var response = Utils.isLiveConnection(URI);
+        var uri = (String) pjp.getArgs()[0];
+        var response = Utils.isLiveConnection(uri);
         if(response.getStatusCode().isError())
             return response;
         return pjp.proceed();

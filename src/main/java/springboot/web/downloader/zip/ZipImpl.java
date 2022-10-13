@@ -16,7 +16,7 @@ public class ZipImpl implements Zip {
         String siteZip = siteFolder + ".zip";
         String zip = "zip -9 -r " + siteZip + " " + siteFolder;
         String mv = " && mv " + siteZip + " ../archived";
-        return Utils.runProcess(zip + mv, "ZIP", WebDownloader.baseSites);
+        return Utils.runProcess(zip + mv, "ZIP", WebDownloader.BASE_SITES);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.service.RestService;
 
 @Slf4j
@@ -26,31 +27,31 @@ public class Rest {
     }
 
     @GetMapping(path = "/size", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> discoverSize(
+    public ResponseEntity<ResponseDto> discoverSize(
             @RequestParam(value = "taskId") final String taskId,
             @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang){
         return this.restService.getSize(taskId, lang);
     }
 
     @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> statusTask(
+    public ResponseEntity<ResponseDto> statusTask(
             @RequestParam(value = "taskId") final String taskId,
             @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang){
         return this.restService.statusTask(taskId, lang);
     }
 
     @GetMapping(path = "/require", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> requireDownload(@RequestParam(value = "uri") final String URI){
+    public ResponseEntity<ResponseDto> requireDownload(@RequestParam(value = "uri") final String URI){
         return this.restService.requireDownload(URI);
     }
 
     @GetMapping(path = "/estimate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> estimateSize(@RequestParam(value = "uri") final String URI){
+    public ResponseEntity<ResponseDto> estimateSize(@RequestParam(value = "uri") final String URI){
         return this.restService.estimateSize(URI);
     }
 
     @GetMapping(path = "/map", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> mapSite(@RequestParam(value = "uri") final String URI){
+    public ResponseEntity<ResponseDto> mapSite(@RequestParam(value = "uri") final String URI){
         return this.restService.mapSite(URI);
     }
 

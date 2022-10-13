@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.    util.concurrent.Future;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 
 @SpringBootTest
@@ -50,7 +50,7 @@ class RestServiceTest {
     @Test
     @Order(2)
     void getZipSuccess() {
-        final var response = this.restService.getZip(taskId, StatusTask.Default);
+        final var response = this.restService.getZip(taskId, StatusTask.DEFAULT);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(28, response.getHeaders().getContentLength() / 100);
     }
@@ -72,7 +72,7 @@ class RestServiceTest {
     }
 
     private void notFoundTest(final FunctionTwoArgs<String, String, ResponseEntity<?>> restMethod){
-        final var response = restMethod.apply("XXX-VVV-III", StatusTask.Default);
+        final var response = restMethod.apply("XXX-VVV-III", StatusTask.DEFAULT);
         ResponseDto responseDto = Objects.requireNonNull((ResponseDto) response.getBody());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), responseDto.getStatusCode());
@@ -109,7 +109,7 @@ class RestServiceTest {
     private ResponseEntity<ResponseDto> statusTaskTest(final boolean isDone, final StatusTask statusTask, final boolean isThrowable)
             throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(isDone, statusTask, isThrowable);
-        return restService.statusTask(task, StatusTask.Default);
+        return restService.statusTask(task, StatusTask.DEFAULT);
     }
 
     @SuppressWarnings("unchecked")
@@ -121,7 +121,7 @@ class RestServiceTest {
         if(isThrowable)
             Mockito.when(mockFuture.get()).thenThrow(ExecutionException.class);
         else Mockito.when(mockFuture.get()).thenReturn(statusTask);
-        TaskRegistry.registry.put(task, mockFuture);
+        TaskRegistry.getRegistry().put(task, mockFuture);
         return task;
     }
 
@@ -134,7 +134,7 @@ class RestServiceTest {
     @Test
     @Order(5)
     void discoverSizeTestSuccess(){
-        var response = this.restService.getSize(taskId, StatusTask.Default);
+        var response = this.restService.getSize(taskId, StatusTask.DEFAULT);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         int size = Integer.parseInt(Objects.requireNonNull(
                 Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
@@ -145,7 +145,7 @@ class RestServiceTest {
     @Test
     void discoverSizeTestFileNotFound() throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(true, StatusTask.DONE, false);
-        var response = this.restService.getSize(task, StatusTask.Default);
+        var response = this.restService.getSize(task, StatusTask.DEFAULT);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals("File " + task + " not found", Objects.requireNonNull(response.getBody()).getResult());
     }
@@ -160,7 +160,7 @@ class RestServiceTest {
         String successUrl = "https://locallhost.com/";
         final var response = rest.apply(successUrl);
         taskId = Objects.requireNonNull(Objects.requireNonNull(response.getBody()).getResult());
-        final var future = TaskRegistry.registry.get(taskId);
+        final var future = TaskRegistry.getRegistry().get(taskId);
         StatusTask statusTask = future.get();
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(UUID.fromString(taskId).getClass(), UUID.class);

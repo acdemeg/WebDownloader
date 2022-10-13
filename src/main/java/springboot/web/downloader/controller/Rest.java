@@ -19,18 +19,24 @@ public class Rest {
     }
 
     @GetMapping(path = "/zip", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<?> getZip(@RequestParam(value = "taskId") final String taskId){
-        return this.restService.getZip(taskId);
+    public ResponseEntity<?> getZip(
+            @RequestParam(value = "taskId") final String taskId,
+            @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang){
+        return this.restService.getZip(taskId, lang);
     }
 
     @GetMapping(path = "/size", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> discoverSize(@RequestParam(value = "taskId") final String taskId){
-        return this.restService.getSize(taskId);
+    public ResponseEntity<?> discoverSize(
+            @RequestParam(value = "taskId") final String taskId,
+            @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang){
+        return this.restService.getSize(taskId, lang);
     }
 
     @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> statusTask(@RequestParam(value = "taskId") final String taskId){
-        return this.restService.statusTask(taskId);
+    public ResponseEntity<?> statusTask(
+            @RequestParam(value = "taskId") final String taskId,
+            @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang){
+        return this.restService.statusTask(taskId, lang);
     }
 
     @GetMapping(path = "/require", produces = MediaType.APPLICATION_JSON_VALUE)

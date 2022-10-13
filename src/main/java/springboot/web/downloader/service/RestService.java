@@ -38,14 +38,14 @@ public interface RestService {
      * @param taskId string which is also .zip-file name
      * @return zip file as resource
      */
-    ResponseEntity<?> getZip(final String taskId);
+    ResponseEntity<?> getZip(final String taskId, final String lang);
 
     /**
      * This method allow monitoring status web-task
      * @param taskId task identifier received from client
      * @return status task (DONE, ERROR, RUNNING, UNDEFINED)
      */
-    ResponseEntity<ResponseDto> statusTask(final String taskId);
+    ResponseEntity<ResponseDto> statusTask(final String taskId, final String lang);
 
     /**
      * This method allow get approximately size web-resource
@@ -55,5 +55,5 @@ public interface RestService {
      * @param taskId task identifier received from client
      * @return approximately size web-resource
      */
-    ResponseEntity<ResponseDto> getSize(final String taskId);
+    ResponseEntity<ResponseDto> getSize(final String taskId, final String lang);
 }

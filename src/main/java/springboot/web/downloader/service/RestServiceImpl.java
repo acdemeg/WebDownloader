@@ -60,32 +60,32 @@ public class RestServiceImpl implements RestService {
     }
     
     @Override
-    public ResponseEntity<ResponseDto> statusTask(final String taskId) {
+    public ResponseEntity<ResponseDto> statusTask(final String taskId, final String lang) {
         try {
             var future = TaskRegistry.registry.get(taskId);
             if(Objects.isNull(future))
                 return ResponseUtils.notFound("Task with id: " + taskId + " not found");
             if(!future.isDone())
-                return ResponseUtils.ok(StatusTask.RUNNING.name());
+                return ResponseUtils.ok(StatusTask.RUNNING.getStatus(lang));
             var result = future.get();
             if(result.equals(StatusTask.ERROR))
-                return ResponseUtils.internalServerError(StatusTask.ERROR.name());
-            return ResponseUtils.ok(StatusTask.DONE.name());
+                return ResponseUtils.internalServerError(StatusTask.ERROR.getStatus(lang));
+            return ResponseUtils.ok(StatusTask.DONE.getStatus(lang));
         }
         catch (Exception ex){
-            return ResponseUtils.internalServerError(StatusTask.UNDEFINED.name());
+            return ResponseUtils.internalServerError(StatusTask.UNDEFINED.getStatus(lang));
         }
     }
 
     @Override
-    public ResponseEntity<?> getZip(final String taskId) {
+    public ResponseEntity<?> getZip(final String taskId, final String lang) {
         try {
-            ResponseEntity<ResponseDto>  res = getStatusTask(taskId);
+            ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
             if (!res.getStatusCode().is2xxSuccessful())
                 return res;
 
-            ResponseEntity<ResponseDto> response = this.statusTask(taskId);
-            if(!Objects.equals(Objects.requireNonNull(response.getBody()).getResult(), StatusTask.DONE.name()))
+            ResponseEntity<ResponseDto> response = this.statusTask(taskId, lang);
+            if(!Objects.equals(Objects.requireNonNull(response.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
                 return response;
 
             String path = WebDownloader.baseArchived + taskId + ".zip";
@@ -105,9 +105,9 @@ public class RestServiceImpl implements RestService {
     }
     
     @Override
-    public ResponseEntity<ResponseDto> getSize(String taskId) {
+    public ResponseEntity<ResponseDto> getSize(final String taskId, final String lang) {
         try {
-            ResponseEntity<ResponseDto>  res = getStatusTask(taskId);
+            ResponseEntity<ResponseDto>  res = getStatusTask(taskId, lang);
             if (!res.getStatusCode().is2xxSuccessful())
                 return res;
 
@@ -132,18 +132,18 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    private ResponseEntity<ResponseDto> getStatusTask(String taskId){
-        ResponseEntity<ResponseDto> response = this.statusTask(taskId);
+    private ResponseEntity<ResponseDto> getStatusTask(final String taskId, final String lang){
+        ResponseEntity<ResponseDto> response = this.statusTask(taskId, lang);
         String statusTask =  Objects.requireNonNull(response.getBody()).getResult();
-        if(Objects.equals(statusTask, StatusTask.RUNNING.name())
-                || Objects.equals(statusTask, StatusTask.UNDEFINED.name())
-                || Objects.equals(statusTask, StatusTask.ERROR.name())){
+        if(Objects.equals(statusTask, StatusTask.RUNNING.getStatus(lang))
+                || Objects.equals(statusTask, StatusTask.UNDEFINED.getStatus(lang))
+                || Objects.equals(statusTask, StatusTask.ERROR.getStatus(lang))){
             return ResponseUtils.preconditionFailed("Task with id: " + taskId + " have status " + statusTask);
         }
         return response;
     }
 
-    private ResponseEntity<ResponseDto> runWebTask(String URI, TypeTask estimate) {
+    private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask estimate) {
         String taskId = UUID.randomUUID().toString();
         final var exec = Executors.newSingleThreadExecutor();
         final var future = exec.submit(webTaskFactory.apply(taskId, URI, estimate));

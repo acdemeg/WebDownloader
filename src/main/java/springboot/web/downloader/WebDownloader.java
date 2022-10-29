@@ -14,6 +14,7 @@ public class WebDownloader {
 
 	public static final String BASE_SITES = System.getProperty("user.home") + "/sites/";
 	public static final String BASE_ARCHIVED = System.getProperty("user.home") + "/archived/";
+	public static final String DEFAULT_LANGUAGE = "Eng";
 
 	public static void main(String[] args) throws IOException {
 		SpringApplication.run(WebDownloader.class, args);

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.TestUtils;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.FunctionTwoArgs;
@@ -19,6 +20,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+
+import static springboot.web.downloader.WebDownloader.DEFAULT_LANGUAGE;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -51,7 +54,7 @@ class RestServiceTest {
     @Test
     @Order(2)
     void getZipSuccess() {
-        final var res1 = this.restService.find(taskId, StatusTask.DEFAULT);
+        final var res1 = this.restService.find(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, res1.getStatusCode());
         String fileName = Objects.requireNonNull(res1.getBody()).getResult();
         final var res2 = this.restService.getZip(fileName);
@@ -80,7 +83,7 @@ class RestServiceTest {
     }
 
     private void notFoundTest(final FunctionTwoArgs<String, String, ResponseEntity<?>> restMethod){
-        final var response = restMethod.apply("XXX-VVV-III", StatusTask.DEFAULT);
+        final var response = restMethod.apply("XXX-VVV-III", DEFAULT_LANGUAGE);
         ResponseDto responseDto = Objects.requireNonNull((ResponseDto) response.getBody());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), responseDto.getStatusCode());
@@ -117,7 +120,7 @@ class RestServiceTest {
     private ResponseEntity<ResponseDto> statusTaskTest(final boolean isDone, final StatusTask statusTask, final boolean isThrowable)
             throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(isDone, statusTask, isThrowable);
-        return restService.statusTask(task, StatusTask.DEFAULT);
+        return restService.statusTask(task, DEFAULT_LANGUAGE);
     }
 
     @SuppressWarnings("unchecked")
@@ -142,7 +145,7 @@ class RestServiceTest {
     @Test
     @Order(5)
     void discoverSizeTestSuccess(){
-        var response = this.restService.getSize(taskId, StatusTask.DEFAULT);
+        var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         int size = Integer.parseInt(Objects.requireNonNull(
                 Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
@@ -153,9 +156,12 @@ class RestServiceTest {
     @Test
     void discoverSizeTestFileNotFound() throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(true, StatusTask.DONE, false);
-        var response = this.restService.getSize(task, StatusTask.DEFAULT);
+        var response = this.restService.getSize(task, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertEquals("File " + task + " not found", Objects.requireNonNull(response.getBody()).getResult());
+        Assertions.assertEquals(
+                ErrorMessage.FILE_NOT_FOUND.getMessage(DEFAULT_LANGUAGE),
+                Objects.requireNonNull(response.getBody()).getResult()
+        );
     }
 
     @Test

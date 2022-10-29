@@ -11,7 +11,6 @@ public enum StatusTask {
 
     private final String eng;
     private final String rus;
-    public static final String DEFAULT = "Eng";
 
     StatusTask(final String Eng, final String Rus){
         this.eng = Eng;

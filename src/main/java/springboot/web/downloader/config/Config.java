@@ -54,7 +54,6 @@ public class Config {
         return this::webTaskWithParam;
     }
 
-    //todo temporary enable for testing purposes
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

@@ -3,6 +3,7 @@ package springboot.web.downloader.zip;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
+import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.utils.Utils;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class ZipImpl implements Zip {
         String siteZip = siteFolder + ".zip";
         String zip = "zip -9 -r " + siteZip + " " + siteFolder;
         String mv = " && mv " + siteZip + " ../archived";
-        return Utils.runProcess(zip + mv, "ZIP", WebDownloader.BASE_SITES);
+        return Utils.runProcess(zip + mv, NativeProcessName.ZIP.name(), WebDownloader.BASE_SITES);
     }
 
 }

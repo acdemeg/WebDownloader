@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.annotations.CheckUriConnection;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.enums.ErrorMessage;
+import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.enums.TypeTask;
 import springboot.web.downloader.registory.TaskRegistry;
@@ -35,6 +37,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 public class RestServiceImpl implements RestService {
 
     private final FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory;
+    public static final String DISCOVER_SIZE_SCRIPT = "./src/main/resources/discover-size.sh";
 
     @Autowired
     public RestServiceImpl(FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory) {
@@ -65,7 +68,7 @@ public class RestServiceImpl implements RestService {
         try {
             var future = TaskRegistry.getRegistry().get(taskId);
             if(Objects.isNull(future))
-                return ResponseUtils.notFound("Task with id: " + taskId + " not found");
+                return ResponseUtils.notFound(ErrorMessage.TASK_NOT_FOUND.getMessage(lang));
             if(!future.isDone())
                 return ResponseUtils.ok(StatusTask.RUNNING.getStatus(lang));
             var result = future.get();
@@ -77,21 +80,6 @@ public class RestServiceImpl implements RestService {
             Thread.currentThread().interrupt();
             return ResponseUtils.internalServerError(StatusTask.UNDEFINED.getStatus(lang));
         }
-    }
-
-    @Override
-    @SneakyThrows
-    public ResponseEntity<Resource> getZip(final String fileName){
-
-        File zip = new File(fileName);
-        Path zipPath = Paths.get(zip.getAbsolutePath());
-        Resource resource = new ByteArrayResource(Files.readAllBytes(zipPath));
-        long length = FileUtils.sizeOf(zip);
-        return ResponseEntity.ok()
-                .header(CONTENT_DISPOSITION, "attachment;filename=site.zip")
-                .contentType(MediaType.valueOf("application/zip"))
-                .contentLength(length)
-                .body(resource);
     }
 
     @Override
@@ -110,7 +98,22 @@ public class RestServiceImpl implements RestService {
         if(zip.exists() && zip.isFile() && zip.canRead()){
             return ResponseUtils.ok(path);
         }
-        return ResponseUtils.notFound("Not found zip-file for taskId: " + taskId);
+        return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));
+    }
+
+    @Override
+    @SneakyThrows
+    public ResponseEntity<Resource> getZip(final String fileName){
+
+        File zip = new File(fileName);
+        Path zipPath = Paths.get(zip.getAbsolutePath());
+        Resource resource = new ByteArrayResource(Files.readAllBytes(zipPath));
+        long length = FileUtils.sizeOf(zip);
+        return ResponseEntity.ok()
+                .header(CONTENT_DISPOSITION, "attachment;filename=site.zip")
+                .contentType(MediaType.valueOf("application/zip"))
+                .contentLength(length)
+                .body(resource);
     }
 
     @Override
@@ -122,14 +125,14 @@ public class RestServiceImpl implements RestService {
 
             String wgetLog = WebDownloader.BASE_SITES + taskId + "/wget-log";
             if(Files.notExists(Path.of(wgetLog)))
-                return ResponseUtils.notFound("File " + taskId + " not found");
+                return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));
 
-            Path sh = Paths.get("./src/main/resources/discover-size.sh").toAbsolutePath();
+            Path sh = Paths.get(DISCOVER_SIZE_SCRIPT).toAbsolutePath();
             int exitCode = Utils.runProcess(
                     sh + " " + wgetLog,
-                    "DISCOVER_SIZE", WebDownloader.BASE_SITES + taskId);
+                    NativeProcessName.DISCOVER_SIZE.name(), WebDownloader.BASE_SITES + taskId);
             if(exitCode != 0)
-                return ResponseUtils.internalServerError("Exit code: " + exitCode);
+                return ResponseUtils.internalServerError(ErrorMessage.INTERNAL_SERVER_ERROR.getMessage(lang));
 
             var list = FileUtils.readLines(new File(wgetLog), StandardCharsets.UTF_8);
             String byteSize = list.get(list.size() - 1);
@@ -148,7 +151,7 @@ public class RestServiceImpl implements RestService {
         if(Objects.equals(statusTask, StatusTask.RUNNING.getStatus(lang))
                 || Objects.equals(statusTask, StatusTask.UNDEFINED.getStatus(lang))
                 || Objects.equals(statusTask, StatusTask.ERROR.getStatus(lang))){
-            return ResponseUtils.preconditionFailed("Task with id: " + taskId + " have status " + statusTask);
+            return ResponseUtils.preconditionFailed(ErrorMessage.PRECONDITION_FAILED.getMessage(lang));
         }
         return response;
     }

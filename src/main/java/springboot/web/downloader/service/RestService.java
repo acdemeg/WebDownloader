@@ -42,7 +42,7 @@ public interface RestService {
     ResponseEntity<Resource> getZip(final String fileName);
 
     /**
-     * This method allow find zip archive file and if success return {fileName}
+     * This method allow find zip archive file and if success return {@code fileName}
      * @param taskId string which is also .zip-file name
      * @return zip file as resource
      */

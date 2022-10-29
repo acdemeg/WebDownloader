@@ -1,8 +1,7 @@
 package springboot.web.downloader.enums;
 
 /**
- * This class represent statuses set which
- * could be assigned on Task
+ * This class represent status of Task
  */
 public enum StatusTask {
     DONE("DONE", "ВЫПОЛНЕНО"),

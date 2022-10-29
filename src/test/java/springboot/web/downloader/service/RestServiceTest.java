@@ -13,6 +13,7 @@ import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.FunctionTwoArgs;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -50,15 +51,22 @@ class RestServiceTest {
     @Test
     @Order(2)
     void getZipSuccess() {
-        final var response = this.restService.getZip(taskId, StatusTask.DEFAULT);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(28, response.getHeaders().getContentLength() / 100);
+        final var res1 = this.restService.find(taskId, StatusTask.DEFAULT);
+        Assertions.assertEquals(HttpStatus.OK, res1.getStatusCode());
+        String fileName = Objects.requireNonNull(res1.getBody()).getResult();
+        final var res2 = this.restService.getZip(fileName);
+        Assertions.assertEquals(HttpStatus.OK, res2.getStatusCode());
+        Assertions.assertEquals(28, res2.getHeaders().getContentLength() / 100);
     }
 
     @Test
     @Order(3)
     void getZipError() {
-        notFoundTest(this.restService::getZip);
+        Exception thrown = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> this.restService.getZip("XXX-VVV-III")
+        );
+        Assertions.assertEquals(thrown.getCause().getClass(), NoSuchFileException.class);
     }
 
     @Test

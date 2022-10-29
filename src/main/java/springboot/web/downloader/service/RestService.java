@@ -1,5 +1,6 @@
 package springboot.web.downloader.service;
 
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.dto.ResponseDto;
 
@@ -35,10 +36,17 @@ public interface RestService {
 
     /**
      * This method allow download zip archive as octet-stream
+     * @param fileName name of zip-archive file
+     * @return zip file as resource
+     */
+    ResponseEntity<Resource> getZip(final String fileName);
+
+    /**
+     * This method allow find zip archive file and if success return {fileName}
      * @param taskId string which is also .zip-file name
      * @return zip file as resource
      */
-    ResponseEntity<?> getZip(final String taskId, final String lang);
+    ResponseEntity<ResponseDto> find(final String taskId, final String lang);
 
     /**
      * This method allow monitoring status web-task

@@ -1,6 +1,7 @@
 package springboot.web.downloader.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +20,16 @@ public class Rest {
         this.restService = restService;
     }
 
-    @GetMapping(path = "/zip", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<?> getZip(
+    @GetMapping(path = "/find", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> find(
             @RequestParam(value = "taskId") final String taskId,
             @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang){
-        return this.restService.getZip(taskId, lang);
+        return this.restService.find(taskId, lang);
+    }
+
+    @GetMapping(path = "/zip", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getZip(@RequestParam(value = "fileName") final String fileName){
+        return this.restService.getZip(fileName);
     }
 
     @GetMapping(path = "/size", produces = MediaType.APPLICATION_JSON_VALUE)

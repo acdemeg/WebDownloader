@@ -19,7 +19,7 @@ public final class TaskRegistry {
 
     private static final Map<String, Future<StatusTask>> registry = new ConcurrentHashMap<>();
 
-    public static Map<String, Future<StatusTask>> getRegistry(){
+    public static Map<String, Future<StatusTask>> getRegistry() {
         return registry;
     }
 }

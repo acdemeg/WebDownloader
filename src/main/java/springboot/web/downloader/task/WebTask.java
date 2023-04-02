@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
  * client able to monitoring WebTask status.
  * WebTask is Prototype bean and creation new way in {@code Config.class}
  * {<code>
- *     public FunctionTwoArgs<String, String, WebTask> webTaskFactory()
+ * public FunctionTwoArgs<String, String, WebTask> webTaskFactory()
  * </code>}
  */
 public class WebTask implements Callable<StatusTask> {
@@ -39,17 +39,16 @@ public class WebTask implements Callable<StatusTask> {
 
     @Override
     public StatusTask call() throws Exception {
-        if (typeTask.equals(TypeTask.ESTIMATE)){
+        if (typeTask.equals(TypeTask.ESTIMATE)) {
             return estimateSize();
-        }
-        else return requireDownload();
+        } else return requireDownload();
     }
 
     private StatusTask requireDownload() throws IOException, ExecutionException, InterruptedException {
         int exitCode = 1;
         String dir = WebDownloader.BASE_SITES + taskId;
         Utils.createDirectory(dir);
-        if(wget.download(uri, dir) == 0){
+        if (wget.download(uri, dir) == 0) {
             exitCode = zip.wrapToZip(taskId);
         }
         Utils.wgetLogging(dir);

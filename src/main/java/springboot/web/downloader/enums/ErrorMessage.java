@@ -12,12 +12,12 @@ public enum ErrorMessage {
     private final String eng;
     private final String rus;
 
-    ErrorMessage(final String Eng, final String Rus){
+    ErrorMessage(final String Eng, final String Rus) {
         this.eng = Eng;
         this.rus = Rus;
     }
 
-    public String getMessage(final String lang){
+    public String getMessage(final String lang) {
         return (lang.equals("Eng")) ? this.eng : this.rus;
     }
 }

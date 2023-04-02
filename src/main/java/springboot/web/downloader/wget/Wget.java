@@ -14,6 +14,7 @@ public interface Wget {
      * This method perform run shell-utility 'wget'
      * with need number of parameters in order to
      * create local copy web-resource
+     *
      * @param URI root link web-resource
      * @param dir dest folder for download
      * @return status code shell-command
@@ -24,6 +25,7 @@ public interface Wget {
      * This method perform run shell-utility 'wget'
      * in spider mode for approximately estimate size web-resource
      * Method not create none local files and directories except wget-log
+     *
      * @param URI root link web-resource
      * @return status code shell-command
      */

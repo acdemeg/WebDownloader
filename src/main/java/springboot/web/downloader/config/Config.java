@@ -37,6 +37,7 @@ public class Config {
     /**
      * Bean is repository which keeping last 100 http-request
      * and presenting logging ability in separate file
+     *
      * @return {@code HttpTrace} repository
      */
     @Bean
@@ -46,8 +47,9 @@ public class Config {
 
     /**
      * Two next beans represents prototype-bean fabric
-     * with two-arguments bean constructor
-     * @return function interface for two arguments
+     * with many arguments bean constructor
+     *
+     * @return function interface for many arguments
      */
     @Bean
     public FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory() {
@@ -60,8 +62,8 @@ public class Config {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry
-                    .addMapping("/**")
-                    .allowedOrigins("http://localhost:3000");
+                        .addMapping("/**")
+                        .allowedOrigins("http://localhost:3000");
             }
         };
     }

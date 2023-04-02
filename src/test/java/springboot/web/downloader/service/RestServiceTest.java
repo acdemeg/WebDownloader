@@ -53,7 +53,7 @@ class RestServiceTest {
 
     @Test
     @Order(2)
-    void getZipSuccess() {
+    void getZipSuccess() throws NoSuchFileException {
         final var res1 = this.restService.find(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, res1.getStatusCode());
         String fileName = Objects.requireNonNull(res1.getBody()).getResult();
@@ -66,10 +66,10 @@ class RestServiceTest {
     @Order(3)
     void getZipError() {
         Exception thrown = Assertions.assertThrows(
-                RuntimeException.class,
+                NoSuchFileException.class,
                 () -> this.restService.getZip("XXX-VVV-III")
         );
-        Assertions.assertEquals(thrown.getCause().getClass(), NoSuchFileException.class);
+        Assertions.assertEquals(thrown.getClass(), NoSuchFileException.class);
     }
 
     @Test

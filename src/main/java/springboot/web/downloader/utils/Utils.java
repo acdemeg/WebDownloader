@@ -24,8 +24,9 @@ public final class Utils {
 
     /**
      * Method perform creating folders for 'sites' and 'archived'
+     *
      * @throws IOException if occurs error in time creating folders
-     * or files with same name already exist
+     *                     or files with same name already exist
      */
     public static void prepareDirectories() throws IOException {
         FileUtils.forceMkdir(new File(WebDownloader.BASE_SITES));
@@ -35,7 +36,8 @@ public final class Utils {
 
     /**
      * Common method which perform logging for standard output shell-command
-     * @param process referred to running shell native process
+     *
+     * @param process     referred to running shell native process
      * @param processName conditional internal process name
      */
     public static void logProcess(final Process process, final String processName) throws IOException {
@@ -45,6 +47,7 @@ public final class Utils {
 
     /**
      * Method extract log-info from wget-log file and write it in application logs
+     *
      * @param dir to point on site location folder
      */
     public static void wgetLogging(final String dir) throws IOException {
@@ -55,6 +58,7 @@ public final class Utils {
 
     /**
      * Common method for creation new directory
+     *
      * @param dir path to new folder
      */
     public static void createDirectory(final String dir) throws IOException {
@@ -63,9 +67,10 @@ public final class Utils {
 
     /**
      * Common method for run any native process
-     * @param command shell executed command with params
+     *
+     * @param command     shell executed command with params
      * @param processName name process which run
-     * @param workDir working directory for run process
+     * @param workDir     working directory for run process
      * @return exit code shell-utility
      */
     public static int runProcess(final String command, final String processName, final String workDir)
@@ -80,14 +85,14 @@ public final class Utils {
 
     /**
      * This method performs check of availability remote web-resource
+     *
      * @param URI remote resource identifier
      * @return test connection info
      */
-    public static ResponseEntity<?> isLiveConnection(final String URI){
+    public static ResponseEntity<?> isLiveConnection(final String URI) {
         try {
             return new RestTemplate().getForEntity(URI, String.class);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             return ResponseUtils.badRequest(ex);
         }
     }

@@ -1,4 +1,4 @@
 # WebDownloader
 
 ### Description
-Project to aim persisting remote web resources on local storage
+Download the remote website as a zip archive to your device

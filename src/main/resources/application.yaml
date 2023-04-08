@@ -1,0 +1,12 @@
+spring:
+  main:
+    web-application-type: servlet
+
+management:
+  trace:
+    http:
+      include: RESPONSE_HEADERS
+  endpoints:
+    web:
+      exposure:
+        include: httptrace

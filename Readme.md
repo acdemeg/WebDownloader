@@ -1,4 +1,6 @@
 # WebDownloader
 
 ### Description
-Download the remote website as a zip archive to your device
+Project to aim persisting remote web resources on local storage
+also creating site mirror, graph-map of site, estimate of size
+web-site(static resources) etc. Based on WGET utility.

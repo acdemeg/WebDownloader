@@ -34,3 +34,6 @@ out/
 
 ### VS Code ###
 .vscode/
+/src/main/resources/sites/*
+/src/main/resources/archived/*
+/logs/

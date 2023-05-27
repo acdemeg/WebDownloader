@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.annotations.CheckUriConnection;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.enums.StatusTask;
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -61,6 +63,11 @@ public class RestServiceImpl implements RestService {
     public ResponseEntity<ResponseDto> mapSite(final String URI) {
         String taskId = UUID.randomUUID().toString();
         return ResponseUtils.ok(taskId);
+    }
+
+    @Override
+    public ResponseEntity<SiteMapDto> getJsonGraph(final String taskId) {
+        return ResponseUtils.ok(new ArrayList<>(), new ArrayList<>());
     }
 
     @Override

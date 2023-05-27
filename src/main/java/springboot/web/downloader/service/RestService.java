@@ -3,6 +3,7 @@ package springboot.web.downloader.service;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.dto.SiteMapDto;
 
 import java.nio.file.NoSuchFileException;
 
@@ -38,6 +39,14 @@ public interface RestService {
      * @return taskId if URI is available else {@code ErrorStruct}
      */
     ResponseEntity<ResponseDto> mapSite(final String URI);
+
+    /**
+     * This method allow to get json graph which represent hierarchical site structure
+     * if /map method completed successfully before
+     * @param taskId task identifier received from client
+     * @return json graph for UI render
+     */
+    ResponseEntity<SiteMapDto> getJsonGraph(final String taskId);
 
     /**
      * This method allow download zip archive as octet-stream

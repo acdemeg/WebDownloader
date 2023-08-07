@@ -61,8 +61,7 @@ public class RestServiceImpl implements RestService {
     @Override
     @CheckUriConnection
     public ResponseEntity<ResponseDto> mapSite(final String URI) {
-        String taskId = UUID.randomUUID().toString();
-        return ResponseUtils.ok(taskId);
+        return runWebTask(URI, TypeTask.BUILD_MAP);
     }
 
     @Override
@@ -164,10 +163,10 @@ public class RestServiceImpl implements RestService {
         return response;
     }
 
-    private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask estimate) {
+    private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask typeTask) {
         String taskId = UUID.randomUUID().toString();
         final var exec = Executors.newSingleThreadExecutor();
-        final var future = exec.submit(webTaskFactory.apply(taskId, URI, estimate));
+        final var future = exec.submit(webTaskFactory.apply(taskId, URI, typeTask));
         TaskRegistry.getRegistry().put(taskId, future);
         exec.shutdown();
         return ResponseUtils.ok(taskId);

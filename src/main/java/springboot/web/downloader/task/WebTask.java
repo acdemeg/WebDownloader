@@ -3,6 +3,7 @@ package springboot.web.downloader.task;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.enums.TypeTask;
+import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
@@ -39,9 +40,12 @@ public class WebTask implements Callable<StatusTask> {
 
     @Override
     public StatusTask call() throws Exception {
-        if (typeTask.equals(TypeTask.ESTIMATE)) {
-            return estimateSize();
-        } else return requireDownload();
+        switch (typeTask) {
+            case DOWNLOAD: return requireDownload();
+            case ESTIMATE: return estimateSize();
+            case BUILD_MAP: return buildMap();
+            default: return StatusTask.UNDEFINED;
+        }
     }
 
     private StatusTask requireDownload() throws IOException, ExecutionException, InterruptedException {
@@ -60,5 +64,13 @@ public class WebTask implements Callable<StatusTask> {
         Utils.createDirectory(dir);
         int exitCode = wget.estimate(uri, dir);
         return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
+    }
+
+    private StatusTask buildMap() {
+        // TODO make map and put result
+        // 1 - prepare url list
+        // 2 - transform in SiteMapDto
+        TaskRegistry.getResults().put(taskId, null);
+        return StatusTask.UNDEFINED;
     }
 }

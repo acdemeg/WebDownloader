@@ -1,5 +1,7 @@
 package springboot.web.downloader.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.dto.ResponseDto;
@@ -7,11 +9,8 @@ import springboot.web.downloader.dto.SiteMapDto;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseUtils {
-
-    private ResponseUtils() {
-        throw new IllegalStateException("Utility class");
-    }
 
     public static ResponseEntity<ResponseDto> badRequest(final Exception ex) {
         return new ResponseEntity<>(

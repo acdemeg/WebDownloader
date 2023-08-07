@@ -1,25 +1,23 @@
 package springboot.web.downloader.registory;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import springboot.web.downloader.enums.StatusTask;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
- * This class represent registry running now tasks.
- * TaskRegistry based on {@code Map} interface.
- * Registry formed as --> Map<taskId:STRING, taskThread:FUTURE<STRING>>
+ * This class represent registry running now tasks, also result of it
  */
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TaskRegistry {
-
-    private TaskRegistry() {
-        throw new IllegalStateException("Utility class");
-    }
-
+    @Getter
     private static final Map<String, Future<StatusTask>> registry = new ConcurrentHashMap<>();
-
-    public static Map<String, Future<StatusTask>> getRegistry() {
-        return registry;
-    }
+    @Getter
+    private static final Map<String, Serializable> results = new ConcurrentHashMap<>();
 }

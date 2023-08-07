@@ -4,6 +4,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.dto.SiteMapDto;
+import springboot.web.downloader.enums.StatusTask;
 
 import java.nio.file.NoSuchFileException;
 
@@ -68,7 +69,7 @@ public interface RestService {
      * This method allow monitoring status web-task
      *
      * @param taskId task identifier received from client
-     * @return status task (DONE, ERROR, RUNNING, UNDEFINED)
+     * @return status task {@link StatusTask}
      */
     ResponseEntity<ResponseDto> statusTask(final String taskId, final String lang);
 

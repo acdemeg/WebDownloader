@@ -1,10 +1,14 @@
 package springboot.web.downloader.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import springboot.web.downloader.WebDownloader;
 
 import java.io.File;
@@ -16,11 +20,8 @@ import java.nio.charset.StandardCharsets;
  * and prepare environment before application work
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
-
-    private Utils() {
-        throw new IllegalStateException("Utility class");
-    }
 
     /**
      * Method perform creating folders for 'sites' and 'archived'
@@ -89,11 +90,11 @@ public final class Utils {
      * @param URI remote resource identifier
      * @return test connection info
      */
-    public static ResponseEntity<?> isLiveConnection(final String URI) {
+    public static ResponseEntity<String> isLiveConnection(final String URI) {
         try {
             return new RestTemplate().getForEntity(URI, String.class);
         } catch (Exception ex) {
-            return ResponseUtils.badRequest(ex);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 }

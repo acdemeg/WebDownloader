@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import springboot.web.downloader.TestUtils;
 import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.enums.ErrorMessage;
@@ -182,11 +183,8 @@ class RestServiceTest {
     }
 
     private void queryWithClientUrlError(final Function<String, ResponseEntity<?>> rest) {
-        String errorUrl = "https://unreacheble-XXX-url.guru/";
-        final var response = rest.apply(errorUrl);
-        ResponseDto responseDto = Objects.requireNonNull((ResponseDto) response.getBody());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), responseDto.getStatusCode());
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> rest.apply("https://unreacheble-XXX-url.guru/"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
-
 }

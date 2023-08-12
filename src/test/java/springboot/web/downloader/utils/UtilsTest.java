@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -22,8 +23,8 @@ class UtilsTest {
     void isLiveConnection() {
         var success = Utils.isLiveConnection("https://locallhost.com/");
         Assertions.assertEquals(HttpStatus.OK, success.getStatusCode());
-
-        var error = Utils.isLiveConnection("https://unreacheble-XXX-url.guru/");
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, error.getStatusCode());
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> Utils.isLiveConnection("https://unreacheble-XXX-url.guru/"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 }

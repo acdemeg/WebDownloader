@@ -97,4 +97,14 @@ public final class Utils {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
+
+    /**
+     * This method to define url "level"
+     * level value equals count slash(/) symbols in url
+     * @param url something url
+     * @return level value
+     */
+    public static int calcUrlLevel(String url) {
+        return (int) url.chars().filter(ch -> ch == '/').count();
+    }
 }

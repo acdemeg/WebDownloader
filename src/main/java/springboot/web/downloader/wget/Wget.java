@@ -1,7 +1,6 @@
 package springboot.web.downloader.wget;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Here describe methods which take response for download
@@ -19,7 +18,7 @@ public interface Wget {
      * @param dir dest folder for download
      * @return status code shell-command
      */
-    int download(final String URI, final String dir) throws ExecutionException, InterruptedException, IOException;
+    int download(final String URI, final String dir) throws InterruptedException, IOException;
 
     /**
      * This method perform run shell-utility 'wget'
@@ -30,5 +29,13 @@ public interface Wget {
      * @return status code shell-command
      */
     int estimate(final String URI, final String dir) throws IOException, InterruptedException;
+
+    /**
+     * This method check if exist sitemap for current site and return it in case success
+     * otherwise create sitemap using wget utility
+     * @param URI sitemap uri
+     * @return sitemap document
+     */
+    String getSiteMap(final String URI);
 
 }

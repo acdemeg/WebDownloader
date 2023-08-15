@@ -1,16 +1,20 @@
 package springboot.web.downloader.dto;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SiteMapDto {
-    private Integer statusCode;
-    private List<Object> nodes;
-    private List<Object> edges;
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true)
+public class SiteMapDto implements Serializable {
+    @JsonIgnore
+    private static final long serialVersionUID = 1L;
+    Integer statusCode;
+    private List<Node> nodes;
+    private List<Edge> edges;
 }

@@ -49,7 +49,13 @@ class RestServiceTest {
     @Test
     @Order(1)
     void requireDownloadSuccess() throws InterruptedException, ExecutionException {
-        queryWithClientUrlSuccess(this.restService::requireDownload);
+        queryWithClientUrlSuccess(this.restService::requireDownload, "https://locallhost.com/");
+    }
+
+    @Test
+    @Order(1)
+    void requireDownloadError() {
+        queryWithClientUrlError(this.restService::requireDownload);
     }
 
     @Test
@@ -64,7 +70,7 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void getZipError() {
         Exception thrown = Assertions.assertThrows(
                 NoSuchFileException.class,
@@ -74,8 +80,13 @@ class RestServiceTest {
     }
 
     @Test
-    void requireDownloadError() {
-        queryWithClientUrlError(this.restService::requireDownload);
+    void buildMapSiteSuccess() throws ExecutionException, InterruptedException {
+        queryWithClientUrlSuccess(this.restService::mapSite, "https://java-course.ru/");
+    }
+
+    @Test
+    void buildMapSiteError() {
+        queryWithClientUrlError(this.restService::mapSite);
     }
 
     @Test
@@ -140,7 +151,7 @@ class RestServiceTest {
     @Test
     @Order(4)
     void estimateSizeSuccess() throws InterruptedException, ExecutionException {
-        queryWithClientUrlSuccess(this.restService::estimateSize);
+        queryWithClientUrlSuccess(this.restService::estimateSize, "https://locallhost.com/");
     }
 
     @Test
@@ -170,9 +181,8 @@ class RestServiceTest {
         queryWithClientUrlError(this.restService::estimateSize);
     }
 
-    private void queryWithClientUrlSuccess(final Function<String, ResponseEntity<ResponseDto>> rest)
+    private void queryWithClientUrlSuccess(final Function<String, ResponseEntity<ResponseDto>> rest, String successUrl)
             throws InterruptedException, ExecutionException {
-        String successUrl = "https://locallhost.com/";
         final var response = rest.apply(successUrl);
         taskId = Objects.requireNonNull(Objects.requireNonNull(response.getBody()).getResult());
         final var future = TaskRegistry.getRegistry().get(taskId);

@@ -1,16 +1,27 @@
 package springboot.web.downloader.task;
 
 import springboot.web.downloader.WebDownloader;
+import springboot.web.downloader.dto.Edge;
+import springboot.web.downloader.dto.Node;
+import springboot.web.downloader.dto.SiteMapDto;
+import springboot.web.downloader.enums.NodeType;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.enums.TypeTask;
+import springboot.web.downloader.jaxb.XmlUrl;
+import springboot.web.downloader.jaxb.XmlUrlSet;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * This class is abstract task created after client request
@@ -48,7 +59,7 @@ public class WebTask implements Callable<StatusTask> {
         }
     }
 
-    private StatusTask requireDownload() throws IOException, ExecutionException, InterruptedException {
+    private StatusTask requireDownload() throws IOException, InterruptedException {
         int exitCode = 1;
         String dir = WebDownloader.BASE_SITES + taskId;
         Utils.createDirectory(dir);
@@ -66,11 +77,51 @@ public class WebTask implements Callable<StatusTask> {
         return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 
-    private StatusTask buildMap() {
-        // TODO make map and put result
-        // 1 - prepare url list
-        // 2 - transform in SiteMapDto
-        TaskRegistry.getResults().put(taskId, null);
-        return StatusTask.UNDEFINED;
+    private StatusTask buildMap() throws JAXBException {
+        // 1 - create or get sitemap.xml
+        String xml = wget.getSiteMap(uri + "/sitemap.xml");
+        if (xml.isEmpty())
+            return StatusTask.ERROR;
+        JAXBContext jaxbContext = JAXBContext.newInstance(XmlUrlSet.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        StringReader xmlReader = new StringReader(xml);
+        XmlUrlSet xmlUrlSet = (XmlUrlSet) jaxbUnmarshaller.unmarshal(xmlReader);
+        xmlReader.close();
+        // 2 - transform to SiteMapDto.class
+        SiteMapDto siteMap = buildTree(xmlUrlSet);
+        TaskRegistry.getResults().put(taskId, siteMap);
+        return StatusTask.DONE;
+    }
+
+    private SiteMapDto buildTree(XmlUrlSet xmlUrlSet) {
+        List<String> urls = xmlUrlSet.getUrl().stream().map(XmlUrl::getLoc).collect(Collectors.toList());
+        List<Node> nodes = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+        Map<String, Set<String>> tree = new HashMap<>();
+        // build tree
+        Map<Integer, List<String>> levelUrlMap = urls.stream().collect(Collectors.groupingBy(Utils::calcUrlLevel));
+        urls.forEach(root -> {
+            int urlLevel = Utils.calcUrlLevel(root);
+            List<Integer> levels = levelUrlMap.keySet().stream().filter(l -> l > urlLevel).sorted().collect(Collectors.toList());
+            Set<String> urlLinks = new HashSet<>();
+            levels.forEach(level -> urlLinks.addAll(levelUrlMap.get(level).stream().filter(
+                    url -> url.contains(root) && urlLinks.stream().noneMatch(url::contains)).collect(Collectors.toList())));
+            tree.put(root, urlLinks);
+        });
+        // fill nodes and edges
+        tree.forEach((node, children) ->  {
+            int level = calculateNodeLevel(tree, node, 0);
+            nodes.add(new Node(node, NodeType.getType(tree, level, node), Node.getColorByLevel(level), new Node.Data(node)));
+            children.forEach(childNode -> edges.add(new Edge(node + childNode, node, childNode)));
+        });
+
+        return new SiteMapDto(0, nodes, edges);
+    }
+
+    private int calculateNodeLevel(Map<String, Set<String>> urlGraph, String url, int level) {
+        // search potential parent
+        Optional<String> parent = urlGraph.keySet().stream()
+                .filter(url::contains).filter(p -> urlGraph.get(p).contains(url)).findFirst();
+        return parent.map(s -> calculateNodeLevel(urlGraph, s, level + 1)).orElse(level);
     }
 }

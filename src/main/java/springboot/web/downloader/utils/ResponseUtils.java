@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import springboot.web.downloader.dto.Edge;
+import springboot.web.downloader.dto.Node;
 import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.dto.SiteMapDto;
 
@@ -32,7 +34,7 @@ public class ResponseUtils {
                 new ResponseDto(HttpStatus.OK.value(), description), HttpStatus.OK);
     }
 
-    public static ResponseEntity<SiteMapDto> ok(List<Object> nodes, List<Object> edges) {
+    public static ResponseEntity<SiteMapDto> ok(List<Node> nodes, List<Edge> edges) {
         return new ResponseEntity<>(
                 new SiteMapDto(HttpStatus.OK.value(), nodes, edges), HttpStatus.OK);
     }

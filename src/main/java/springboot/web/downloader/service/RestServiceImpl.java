@@ -66,6 +66,9 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<SiteMapDto> getJsonGraph(final String taskId) {
+//        ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
+//        if (!res.getStatusCode().is2xxSuccessful())
+//            return res;
         return ResponseUtils.ok(new ArrayList<>(), new ArrayList<>());
     }
 
@@ -150,7 +153,6 @@ public class RestServiceImpl implements RestService {
             return ResponseUtils.internalServerError(ex.getMessage());
         }
     }
-
 
     private ResponseEntity<ResponseDto> getStatusTask(final String taskId, final String lang) {
         ResponseEntity<ResponseDto> response = this.statusTask(taskId, lang);

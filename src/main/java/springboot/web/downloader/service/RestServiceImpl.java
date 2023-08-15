@@ -23,12 +23,12 @@ import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -65,11 +65,14 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public ResponseEntity<SiteMapDto> getJsonGraph(final String taskId) {
-//        ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
-//        if (!res.getStatusCode().is2xxSuccessful())
-//            return res;
-        return ResponseUtils.ok(new ArrayList<>(), new ArrayList<>());
+    public ResponseEntity<ResponseDto> getJsonGraph(final String taskId, final String lang) {
+        ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
+        if (!res.getStatusCode().is2xxSuccessful()
+                || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
+            return res;
+
+        Serializable siteMap = TaskRegistry.getResults().get(taskId);
+        return ResponseUtils.ok((SiteMapDto) siteMap);
     }
 
     @Override
@@ -92,15 +95,10 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<ResponseDto> find(final String taskId, final String lang) {
-
         ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
-        if (!res.getStatusCode().is2xxSuccessful())
+        if (!res.getStatusCode().is2xxSuccessful()
+                || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
             return res;
-
-        ResponseEntity<ResponseDto> response = this.statusTask(taskId, lang);
-        if (!Objects.equals(Objects.requireNonNull(response.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
-            return response;
-
         String path = WebDownloader.BASE_ARCHIVED + taskId + ".zip";
         File zip = new File(path);
         if (zip.exists() && zip.isFile() && zip.canRead()) {
@@ -111,7 +109,6 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<Resource> getZip(final String fileName) throws NoSuchFileException {
-
         File zip = new File(fileName);
         if(!zip.exists()) {
             throw new NoSuchFileException(fileName);
@@ -130,9 +127,9 @@ public class RestServiceImpl implements RestService {
     public ResponseEntity<ResponseDto> getSize(final String taskId, final String lang) {
         try {
             ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
-            if (!res.getStatusCode().is2xxSuccessful())
+            if (!res.getStatusCode().is2xxSuccessful()
+                    || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
                 return res;
-
             String wgetLog = WebDownloader.BASE_SITES + taskId + "/wget-log";
             if (Files.notExists(Path.of(wgetLog)))
                 return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));

@@ -3,7 +3,6 @@ package springboot.web.downloader.service;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.dto.ResponseDto;
-import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.StatusTask;
 
 import java.nio.file.NoSuchFileException;
@@ -47,7 +46,7 @@ public interface RestService {
      * @param taskId task identifier received from client
      * @return json graph for UI render
      */
-    ResponseEntity<SiteMapDto> getJsonGraph(final String taskId);
+    ResponseEntity<ResponseDto> getJsonGraph(final String taskId, final String lang);
 
     /**
      * This method allow download zip archive as octet-stream

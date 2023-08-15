@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springboot.web.downloader.dto.ResponseDto;
-import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.service.RestService;
 
 import java.nio.file.NoSuchFileException;
@@ -65,8 +64,10 @@ public class Rest {
     }
 
     @GetMapping(path = "/graph", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SiteMapDto> getGraph(@RequestParam(value = "taskId") final String taskId) {
-        return this.restService.getJsonGraph(taskId);
+    public ResponseEntity<ResponseDto> getGraph(
+            @RequestParam(value = "taskId") final String taskId,
+            @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang) {
+        return this.restService.getJsonGraph(taskId, lang);
     }
 
 }

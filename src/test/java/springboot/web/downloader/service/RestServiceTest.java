@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import springboot.web.downloader.TestUtils;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
@@ -80,13 +81,49 @@ class RestServiceTest {
     }
 
     @Test
+    @Order(3)
     void buildMapSiteSuccess() throws ExecutionException, InterruptedException {
         queryWithClientUrlSuccess(this.restService::mapSite, "https://java-course.ru/");
     }
 
     @Test
+    @Order(3)
     void buildMapSiteError() {
         queryWithClientUrlError(this.restService::mapSite);
+    }
+
+    @Test
+    @Order(4)
+    void getJsonGraphSuccess() {
+        final var res = this.restService.getJsonGraph(taskId, DEFAULT_LANGUAGE);
+        SiteMapDto siteMap = (SiteMapDto) res.getBody();
+        Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
+        Assertions.assertNotNull(siteMap);
+        Assertions.assertEquals(75, siteMap.getNodes().size());
+        Assertions.assertEquals(74, siteMap.getEdges().size());
+    }
+
+    @Test
+    @Order(4)
+    void getJsonGraphError() {
+        notFoundTest(this.restService::getJsonGraph);
+    }
+
+    @Test
+    @Order(5)
+    void estimateSizeSuccess() throws InterruptedException, ExecutionException {
+        queryWithClientUrlSuccess(this.restService::estimateSize, "https://locallhost.com/");
+    }
+
+    @Test
+    @Order(6)
+    void discoverSizeTestSuccess(){
+        var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        int size = Integer.parseInt(Objects.requireNonNull(
+                Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
+        Assertions.assertEquals(39, size / 100);
+
     }
 
     @Test
@@ -146,23 +183,6 @@ class RestServiceTest {
         else Mockito.when(mockFuture.get()).thenReturn(statusTask);
         TaskRegistry.getRegistry().put(task, mockFuture);
         return task;
-    }
-
-    @Test
-    @Order(4)
-    void estimateSizeSuccess() throws InterruptedException, ExecutionException {
-        queryWithClientUrlSuccess(this.restService::estimateSize, "https://locallhost.com/");
-    }
-
-    @Test
-    @Order(5)
-    void discoverSizeTestSuccess(){
-        var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        int size = Integer.parseInt(Objects.requireNonNull(
-                Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
-        Assertions.assertEquals(39, size / 100);
-
     }
 
     @Test

@@ -115,7 +115,7 @@ public class WebTask implements Callable<StatusTask> {
             children.forEach(childNode -> edges.add(new Edge(node + childNode, node, childNode)));
         });
 
-        return new SiteMapDto(0, nodes, edges);
+        return new SiteMapDto(nodes, edges);
     }
 
     private int calculateNodeLevel(Map<String, Set<String>> urlGraph, String url, int level) {

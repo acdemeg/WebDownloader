@@ -4,20 +4,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springboot.web.downloader.dto.Edge;
-import springboot.web.downloader.dto.Node;
 import springboot.web.downloader.dto.ResponseDto;
-import springboot.web.downloader.dto.SiteMapDto;
-
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseUtils {
-
-    public static ResponseEntity<ResponseDto> badRequest(final Exception ex) {
-        return new ResponseEntity<>(
-                new ResponseDto(HttpStatus.BAD_REQUEST.value(), ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
-    }
 
     public static ResponseEntity<ResponseDto> notFound(final String description) {
         return new ResponseEntity<>(
@@ -34,9 +24,8 @@ public class ResponseUtils {
                 new ResponseDto(HttpStatus.OK.value(), description), HttpStatus.OK);
     }
 
-    public static ResponseEntity<SiteMapDto> ok(List<Node> nodes, List<Edge> edges) {
-        return new ResponseEntity<>(
-                new SiteMapDto(HttpStatus.OK.value(), nodes, edges), HttpStatus.OK);
+    public static ResponseEntity<ResponseDto> ok(ResponseDto response) {
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public static ResponseEntity<ResponseDto> preconditionFailed(final String description) {

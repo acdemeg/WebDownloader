@@ -26,6 +26,7 @@ public interface Wget {
      * Method not create none local files and directories except wget-log
      *
      * @param URI root link web-resource
+     * @param dir workdir for process
      * @return status code shell-command
      */
     int estimate(final String URI, final String dir) throws IOException, InterruptedException;
@@ -34,8 +35,9 @@ public interface Wget {
      * This method check if exist sitemap for current site and return it in case success
      * otherwise create sitemap using wget utility
      * @param URI sitemap uri
+     * @param dir workdir for process
      * @return sitemap document
      */
-    String getSiteMap(final String URI);
+    String getSiteMap(final String URI, final String dir) throws IOException, InterruptedException;
 
 }

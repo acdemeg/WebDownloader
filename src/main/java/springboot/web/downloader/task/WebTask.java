@@ -77,9 +77,9 @@ public class WebTask implements Callable<StatusTask> {
         return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
     }
 
-    private StatusTask buildMap() throws JAXBException {
-        // 1 - create or get sitemap.xml
-        String xml = wget.getSiteMap(uri + "/sitemap.xml");
+    private StatusTask buildMap() throws JAXBException, IOException, InterruptedException {
+        // 1 - create or generate sitemap.xml
+        String xml = wget.getSiteMap(uri, taskId);
         if (xml.isEmpty())
             return StatusTask.ERROR;
         JAXBContext jaxbContext = JAXBContext.newInstance(XmlUrlSet.class);

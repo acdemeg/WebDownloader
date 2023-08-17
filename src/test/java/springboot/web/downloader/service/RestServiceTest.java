@@ -48,19 +48,19 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(1)
+    @Order(10)
     void requireDownloadSuccess() throws InterruptedException, ExecutionException {
         queryWithClientUrlSuccess(this.restService::requireDownload, "https://locallhost.com/");
     }
 
     @Test
-    @Order(1)
+    @Order(10)
     void requireDownloadError() {
         queryWithClientUrlError(this.restService::requireDownload);
     }
 
     @Test
-    @Order(2)
+    @Order(20)
     void getZipSuccess() throws NoSuchFileException {
         final var res1 = this.restService.find(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, res1.getStatusCode());
@@ -71,7 +71,7 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(2)
+    @Order(20)
     void getZipError() {
         Exception thrown = Assertions.assertThrows(
                 NoSuchFileException.class,
@@ -81,20 +81,20 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(3)
-    void buildMapSiteSuccess() throws ExecutionException, InterruptedException {
-        queryWithClientUrlSuccess(this.restService::mapSite, "https://java-course.ru/");
-    }
-
-    @Test
-    @Order(3)
+    @Order(30)
     void buildMapSiteError() {
         queryWithClientUrlError(this.restService::mapSite);
     }
 
     @Test
-    @Order(4)
-    void getJsonGraphSuccess() {
+    @Order(30)
+    void buildMapSiteSuccessOne() throws ExecutionException, InterruptedException {
+        queryWithClientUrlSuccess(this.restService::mapSite, "https://java-course.ru/");
+    }
+
+    @Test
+    @Order(31)
+    void getJsonGraphSuccessOne() {
         final var res = this.restService.getJsonGraph(taskId, DEFAULT_LANGUAGE);
         SiteMapDto siteMap = (SiteMapDto) res.getBody();
         Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
@@ -104,19 +104,36 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(32)
+    void buildMapSiteSuccessTwo() throws ExecutionException, InterruptedException {
+        queryWithClientUrlSuccess(this.restService::mapSite, "https://locallhost.com/");
+    }
+
+    @Test
+    @Order(33)
+    void getJsonGraphSuccessTwo() {
+        final var res = this.restService.getJsonGraph(taskId, DEFAULT_LANGUAGE);
+        SiteMapDto siteMap = (SiteMapDto) res.getBody();
+        Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
+        Assertions.assertNotNull(siteMap);
+        Assertions.assertEquals(1, siteMap.getNodes().size());
+        Assertions.assertEquals(0, siteMap.getEdges().size());
+    }
+
+    @Test
+    @Order(40)
     void getJsonGraphError() {
         notFoundTest(this.restService::getJsonGraph);
     }
 
     @Test
-    @Order(5)
+    @Order(50)
     void estimateSizeSuccess() throws InterruptedException, ExecutionException {
         queryWithClientUrlSuccess(this.restService::estimateSize, "https://locallhost.com/");
     }
 
     @Test
-    @Order(6)
+    @Order(60)
     void discoverSizeTestSuccess(){
         var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());

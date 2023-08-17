@@ -39,7 +39,6 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 public class RestServiceImpl implements RestService {
 
     private final FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory;
-    public static final String DISCOVER_SIZE_SCRIPT = "./src/main/resources/discover-size.sh";
 
     @Autowired
     public RestServiceImpl(FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory) {
@@ -134,7 +133,7 @@ public class RestServiceImpl implements RestService {
             if (Files.notExists(Path.of(wgetLog)))
                 return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));
 
-            Path sh = Paths.get(DISCOVER_SIZE_SCRIPT).toAbsolutePath();
+            Path sh = Paths.get(WebDownloader.DISCOVER_SIZE_SCRIPT).toAbsolutePath();
             int exitCode = Utils.runProcess(
                     sh + " " + wgetLog,
                     NativeProcessName.DISCOVER_SIZE.name(), WebDownloader.BASE_SITES + taskId);

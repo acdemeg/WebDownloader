@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public final class WgetOptions {
 
     private static final String LEVEL = "1";
-    private static final String QUOTE_SIZE = "10000m";
+    private static final String QUOTE_SIZE = "5000m";
 
     private static final String USER_AGENT = "--user-agent=\"Mozilla/5.0 (X11; Linux x86_64)" +
             " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36\"";
@@ -25,7 +25,7 @@ public final class WgetOptions {
     private static final String BACKGROUND_RUN = "--background"; //off
     private static final String LOG_FILE = "--output-file=wget-log";
     private static final String MIRROR = "--recursive --timestamping --level " + LEVEL + " --dont-remove-listing";
-    private static final String SPIDER = " --spider --server-response --no-directories";
+    private static final String SPIDER = "--spider --server-response --no-directories";
     private static final String QUOTA = "--quota=" + QUOTE_SIZE;
 
     private final String wgetDownload = String.format("wget %s %s %s %s %s %s %s %s %s %s ", USER_AGENT, REFERER,

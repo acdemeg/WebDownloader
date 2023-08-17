@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import springboot.web.downloader.WebDownloader;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,18 +21,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
-
-    /**
-     * Method perform creating folders for 'sites' and 'archived'
-     *
-     * @throws IOException if occurs error in time creating folders
-     *                     or files with same name already exist
-     */
-    public static void prepareDirectories() throws IOException {
-        FileUtils.forceMkdir(new File(WebDownloader.BASE_SITES));
-        FileUtils.forceMkdir(new File(WebDownloader.BASE_ARCHIVED));
-        log.info("Create sites and archived directories if not exist");
-    }
 
     /**
      * Common method which perform logging for standard output shell-command
@@ -53,8 +40,8 @@ public final class Utils {
      */
     public static void wgetLogging(final String dir) throws IOException {
         File file = new File(dir + "/wget-log");
-        final var lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
-        log.info(String.join("\n", lines));
+        String output = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        log.info(output);
     }
 
     /**

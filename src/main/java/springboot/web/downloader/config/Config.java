@@ -70,6 +70,7 @@ public class Config {
 
     @Bean
     @Scope(value = "prototype")
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public WebTask webTaskWithParam(String taskId, String uri, TypeTask typeTask) {
         return new WebTask(wget, zip, taskId, uri, typeTask);
     }

@@ -1,5 +1,6 @@
 package springboot.web.downloader.task;
 
+import org.xml.sax.SAXException;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.dto.Edge;
 import springboot.web.downloader.dto.Node;
@@ -14,11 +15,8 @@ import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -52,45 +50,54 @@ public class WebTask implements Callable<StatusTask> {
     @Override
     public StatusTask call() throws Exception {
         switch (typeTask) {
-            case DOWNLOAD: return requireDownload();
-            case ESTIMATE: return estimateSize();
-            case BUILD_MAP: return buildMap();
-            default: return StatusTask.UNDEFINED;
+            case DOWNLOAD:
+                return requireDownload();
+            case ESTIMATE:
+                return estimateSize();
+            case BUILD_MAP:
+                return buildMap();
+            default:
+                return StatusTask.UNDEFINED;
         }
     }
 
-    private StatusTask requireDownload() throws IOException, InterruptedException {
-        int exitCode = 1;
-        String dir = WebDownloader.BASE_SITES + taskId;
-        Utils.createDirectory(dir);
-        if (wget.download(uri, dir) == 0) {
-            exitCode = zip.wrapToZip(taskId);
-        }
-        Utils.wgetLogging(dir);
-        return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
-    }
-
-    private StatusTask estimateSize() throws IOException, InterruptedException {
-        String dir = WebDownloader.BASE_SITES + taskId;
-        Utils.createDirectory(dir);
-        int exitCode = wget.estimate(uri, dir);
-        return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
-    }
-
-    private StatusTask buildMap() throws JAXBException, IOException, InterruptedException {
-        // 1 - create or generate sitemap.xml
-        String xml = wget.getSiteMap(uri, taskId);
-        if (xml.isEmpty())
+    private StatusTask requireDownload() throws InterruptedException {
+        try {
+            int exitCode = 1;
+            String dir = WebDownloader.BASE_SITES + taskId;
+            Utils.createDirectory(dir);
+            if (wget.download(uri, dir) == 0) {
+                exitCode = zip.wrapToZip(taskId);
+            }
+            Utils.wgetLogging(dir);
+            return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
+        } catch (IOException ex) {
             return StatusTask.ERROR;
-        JAXBContext jaxbContext = JAXBContext.newInstance(XmlUrlSet.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        StringReader xmlReader = new StringReader(xml);
-        XmlUrlSet xmlUrlSet = (XmlUrlSet) jaxbUnmarshaller.unmarshal(xmlReader);
-        xmlReader.close();
-        // 2 - transform to SiteMapDto.class
-        SiteMapDto siteMap = buildTree(xmlUrlSet);
-        TaskRegistry.getResults().put(taskId, siteMap);
-        return StatusTask.DONE;
+        }
+    }
+
+    private StatusTask estimateSize() throws InterruptedException {
+        try {
+            String dir = WebDownloader.BASE_SITES + taskId;
+            Utils.createDirectory(dir);
+            int exitCode = wget.estimate(uri, dir);
+            return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
+        } catch (IOException ex) {
+            return StatusTask.ERROR;
+        }
+    }
+
+    private StatusTask buildMap() throws InterruptedException {
+        try {
+            // 1 - create or generate sitemap.xml
+            XmlUrlSet xmlUrlSet = wget.getSiteMap(uri, taskId);
+            // 2 - transform to SiteMapDto.class
+            SiteMapDto siteMap = buildTree(xmlUrlSet);
+            TaskRegistry.getResults().put(taskId, siteMap);
+            return StatusTask.DONE;
+        } catch (IOException | JAXBException | SAXException ex) {
+            return StatusTask.ERROR;
+        }
     }
 
     private SiteMapDto buildTree(XmlUrlSet xmlUrlSet) {
@@ -109,7 +116,7 @@ public class WebTask implements Callable<StatusTask> {
             tree.put(root, urlLinks);
         });
         // fill nodes and edges
-        tree.forEach((node, children) ->  {
+        tree.forEach((node, children) -> {
             int level = calculateNodeLevel(tree, node, 0);
             nodes.add(new Node(node, NodeType.getType(tree, level, node), Node.getColorByLevel(level), new Node.Data(node)));
             children.forEach(childNode -> edges.add(new Edge(node + childNode, node, childNode)));

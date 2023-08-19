@@ -16,10 +16,11 @@ public class WebDownloader {
     private static final String USER_HOME = System.getProperty("user.home");
     public static final String BASE_SITES = USER_HOME + "/sites/";
     public static final String BASE_ARCHIVED = USER_HOME + "/archived/";
-    public static final String BASE_SITEMAPS = USER_HOME + "/sitemaps";
+    public static final String BASE_SITEMAPS = USER_HOME + "/sitemaps/";
     public static final String DEFAULT_LANGUAGE = "Eng";
     public static final String DISCOVER_SIZE_SCRIPT = "./src/main/resources/discover-size.sh";
     public static final String SITEMAP_GENERATOR_SCRIPT = "./src/main/resources/sitemap-generator.sh";
+    public static final String SITEMAP_XSD = "./src/main/resources/sitemaps.org_schemas_sitemap_0.9_sitemap.xsd";
 
     public static void main(String[] args) throws IOException {
         FileUtils.forceMkdir(new File(BASE_SITES));

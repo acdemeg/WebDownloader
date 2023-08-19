@@ -11,7 +11,7 @@ public class TestUtils {
 
     private final static String SITES_PATH = System.getProperty("user.home") + "/test/sites/";
     private final static String ARCHIVED_PATH = System.getProperty("user.home") + "/test/archived/";
-    private final static String SITEMAPS_PATH = System.getProperty("user.home") + "/test/sitemaps";
+    private final static String SITEMAPS_PATH = System.getProperty("user.home") + "/test/sitemaps/";
 
     public static void setFinalStaticField(String fieldName, String value) throws NoSuchFieldException, IllegalAccessException {
         Field field = WebDownloader.class.getField(fieldName);

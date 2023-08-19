@@ -1,5 +1,9 @@
 package springboot.web.downloader.wget;
 
+import org.xml.sax.SAXException;
+import springboot.web.downloader.jaxb.XmlUrlSet;
+
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 
 /**
@@ -36,8 +40,8 @@ public interface Wget {
      * otherwise create sitemap using wget utility
      * @param URI sitemap uri
      * @param dir workdir for process
-     * @return sitemap document
+     * @return sitemap object
      */
-    String getSiteMap(final String URI, final String dir) throws IOException, InterruptedException;
+    XmlUrlSet getSiteMap(final String URI, final String dir) throws IOException, InterruptedException, JAXBException, SAXException;
 
 }

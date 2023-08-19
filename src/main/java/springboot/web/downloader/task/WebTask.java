@@ -118,8 +118,11 @@ public class WebTask implements Callable<StatusTask> {
         // fill nodes and edges
         tree.forEach((node, children) -> {
             int level = calculateNodeLevel(tree, node, 0);
-            nodes.add(new Node(node, NodeType.getType(tree, level, node), Node.getColorByLevel(level), new Node.Data(node)));
-            children.forEach(childNode -> edges.add(new Edge(node + childNode, node, childNode)));
+            nodes.add(
+                    new Node(node, NodeType.getType(tree, level, node), Node.getColorByLevel(level),
+                    new Node.Data(node, Node.getLabelByLevel(level, node))));
+            children.forEach(childNode -> edges.add(
+                    new Edge(String.valueOf((node + childNode).hashCode()), node, childNode)));
         });
 
         return new SiteMapDto(nodes, edges);

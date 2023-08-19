@@ -29,16 +29,19 @@ public class Node implements Serializable {
     @JsonIgnore
     static Random random = new Random();
     @SuppressWarnings("unused")
+    @lombok.Data
     @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
     private static class XYPosition {
         int x = 0;
         int y = 0;
     }
+    @lombok.Data
     @RequiredArgsConstructor
-    @FieldDefaults(makeFinal = true)
+    @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
     public static class Data implements Serializable {
         @JsonIgnore
         private static final long serialVersionUID = 3L;
+        String link;
         String label;
     }
 
@@ -49,4 +52,8 @@ public class Node implements Serializable {
         return colors.get(random.nextInt(11));
     }
 
+    public static String getLabelByLevel(int level, String link) {
+        String[] arr = link.split("/"); // example ['https:', '', 'java-course.ru', 'sitemap.xml']
+        return String.join("/", Arrays.copyOfRange(arr, level + 2, arr.length));
+    }
 }

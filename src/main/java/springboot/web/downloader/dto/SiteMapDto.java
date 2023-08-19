@@ -19,6 +19,7 @@ public class SiteMapDto extends ResponseDto implements Serializable {
     private List<Edge> edges;
 
     public SiteMapDto(List<Node> nodes, List<Edge> edges) {
+        super(200, "Success");
         this.nodes = nodes;
         this.edges = edges;
     }

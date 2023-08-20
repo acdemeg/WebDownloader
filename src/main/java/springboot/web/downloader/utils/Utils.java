@@ -5,14 +5,15 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import springboot.web.downloader.wget.WgetOptions;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * This class provided utils methods for logging
@@ -79,10 +80,24 @@ public final class Utils {
      */
     public static ResponseEntity<String> isLiveConnection(final String URI) {
         try {
-            return new RestTemplate().getForEntity(URI, String.class);
+            return getResponse(URI);
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
+    }
+
+    /**
+     * Helper method for in order to make remote server request
+     * @param URI remote resource identifier
+     * @return response entity as String
+     */
+    public static ResponseEntity<String> getResponse(final String URI) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON, MediaType.TEXT_HTML));
+        headers.add("user-agent", WgetOptions.USER_AGENT);
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        return restTemplate.exchange(URI, HttpMethod.GET, entity, String.class);
     }
 
     /**

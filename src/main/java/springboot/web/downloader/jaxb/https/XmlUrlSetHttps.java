@@ -1,5 +1,5 @@
 
-package springboot.web.downloader.jaxb;
+package springboot.web.downloader.jaxb.https;
 
 import javax.annotation.processing.Generated;
 import javax.xml.bind.annotation.*;
@@ -32,13 +32,13 @@ import java.util.List;
     "any",
     "url"
 })
-@XmlRootElement(name = "urlset", namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
+@XmlRootElement(name = "urlset", namespace = "https://www.sitemaps.org/schemas/sitemap/0.9")
 @Generated({})
-public class XmlUrlSet {
+public class XmlUrlSetHttps {
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
-    @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9", required = true)
+    @XmlElement(namespace = "https://www.sitemaps.org/schemas/sitemap/0.9", required = true)
     protected List<XmlUrl> url;
 
     /**

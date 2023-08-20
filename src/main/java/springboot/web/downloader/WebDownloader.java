@@ -20,7 +20,8 @@ public class WebDownloader {
     public static final String DEFAULT_LANGUAGE = "Eng";
     public static final String DISCOVER_SIZE_SCRIPT = "./src/main/resources/discover-size.sh";
     public static final String SITEMAP_GENERATOR_SCRIPT = "./src/main/resources/sitemap-generator.sh";
-    public static final String SITEMAP_XSD = "./src/main/resources/sitemaps.org_schemas_sitemap_0.9_sitemap.xsd";
+    public static final String SITEMAP_XSD_HTTP = "./src/main/resources/http_sitemap.xsd";
+    public static final String SITEMAP_XSD_HTTPS = "./src/main/resources/https_sitemap.xsd";
 
     public static void main(String[] args) throws IOException {
         FileUtils.forceMkdir(new File(BASE_SITES));

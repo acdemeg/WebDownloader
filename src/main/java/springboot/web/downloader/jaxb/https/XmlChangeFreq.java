@@ -1,5 +1,5 @@
 
-package springboot.web.downloader.jaxb;
+package springboot.web.downloader.jaxb.https;
 
 
 import javax.annotation.processing.Generated;
@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * <pre>
  * &lt;simpleType name="tChangeFreq"&gt;
- *   &lt;restriction base="{<a href="http://www.w3.org/2001/XMLSchema">...</a>}string"&gt;
+ *   &lt;restriction base="{<a href="https://www.w3.org/2001/XMLSchema">...</a>}string"&gt;
  *     &lt;enumeration value="always"/&gt;
  *     &lt;enumeration value="hourly"/&gt;
  *     &lt;enumeration value="daily"/&gt;
@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  *
  */
-@XmlType(name = "tChangeFreq", namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
+@XmlType(name = "tChangeFreq", namespace = "https://www.sitemaps.org/schemas/sitemap/0.9")
 @XmlEnum
 @Generated({})
 public enum XmlChangeFreq {

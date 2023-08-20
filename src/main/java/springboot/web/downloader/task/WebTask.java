@@ -8,8 +8,8 @@ import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.NodeType;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.enums.TypeTask;
-import springboot.web.downloader.jaxb.XmlUrl;
-import springboot.web.downloader.jaxb.XmlUrlSet;
+import springboot.web.downloader.jaxb.IXmlUrlSet;
+import springboot.web.downloader.jaxb.http.XmlUrl;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
@@ -90,7 +90,7 @@ public class WebTask implements Callable<StatusTask> {
     private StatusTask buildMap() throws InterruptedException {
         try {
             // 1 - create or generate sitemap.xml
-            XmlUrlSet xmlUrlSet = wget.getSiteMap(uri, taskId);
+            IXmlUrlSet xmlUrlSet = wget.getSiteMap(uri, taskId);
             // 2 - transform to SiteMapDto.class
             SiteMapDto siteMap = buildTree(xmlUrlSet);
             TaskRegistry.getResults().put(taskId, siteMap);
@@ -100,7 +100,7 @@ public class WebTask implements Callable<StatusTask> {
         }
     }
 
-    private SiteMapDto buildTree(XmlUrlSet xmlUrlSet) {
+    private SiteMapDto buildTree(IXmlUrlSet xmlUrlSet) {
         List<String> urls = xmlUrlSet.getUrl().stream().map(XmlUrl::getLoc).collect(Collectors.toList());
         List<Node> nodes = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();

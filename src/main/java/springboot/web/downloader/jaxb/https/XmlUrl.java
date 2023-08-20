@@ -1,5 +1,5 @@
 
-package springboot.web.downloader.jaxb;
+package springboot.web.downloader.jaxb.https;
 
 import javax.annotation.processing.Generated;
 import javax.xml.bind.annotation.*;
@@ -20,12 +20,12 @@ import java.util.List;
  * <pre>
  * &lt;complexType name="tUrl"&gt;
  *   &lt;complexContent&gt;
- *     &lt;restriction base="{<a href="http://www.w3.org/2001/XMLSchema">...</a>}anyType"&gt;
+ *     &lt;restriction base="{<a href="https://www.w3.org/2001/XMLSchema">...</a>}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="loc" type="{http://www.sitemaps.org/schemas/sitemap/0.9}tLoc"/&gt;
- *         &lt;element name="lastmod" type="{<a href="http://www.sitemaps.org/schemas/sitemap/0.9">...</a>}tLastmod" minOccurs="0"/&gt;
- *         &lt;element name="changefreq" type="{http://www.sitemaps.org/schemas/sitemap/0.9}tChangeFreq" minOccurs="0"/&gt;
- *         &lt;element name="priority" type="{http://www.sitemaps.org/schemas/sitemap/0.9}tPriority" minOccurs="0"/&gt;
+ *         &lt;element name="loc" type="{https://www.sitemaps.org/schemas/sitemap/0.9}tLoc"/&gt;
+ *         &lt;element name="lastmod" type="{<a href="https://www.sitemaps.org/schemas/sitemap/0.9">...</a>}tLastmod" minOccurs="0"/&gt;
+ *         &lt;element name="changefreq" type="{https://www.sitemaps.org/schemas/sitemap/0.9}tChangeFreq" minOccurs="0"/&gt;
+ *         &lt;element name="priority" type="{https://www.sitemaps.org/schemas/sitemap/0.9}tPriority" minOccurs="0"/&gt;
  *         &lt;any namespace='##other' maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tUrl", namespace = "http://www.sitemaps.org/schemas/sitemap/0.9", propOrder = {
+@XmlType(name = "tUrl", namespace = "https://www.sitemaps.org/schemas/sitemap/0.9", propOrder = {
     "loc",
     "lastmod",
     "changefreq",
@@ -46,15 +46,15 @@ import java.util.List;
 @Generated({})
 public class XmlUrl {
 
-    @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9", required = true)
+    @XmlElement(namespace = "https://www.sitemaps.org/schemas/sitemap/0.9", required = true)
     @XmlSchemaType(name = "anyURI")
     protected String loc;
-    @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
+    @XmlElement(namespace = "https://www.sitemaps.org/schemas/sitemap/0.9")
     protected String lastmod;
-    @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
+    @XmlElement(namespace = "https://www.sitemaps.org/schemas/sitemap/0.9")
     @XmlSchemaType(name = "string")
     protected XmlChangeFreq changefreq;
-    @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
+    @XmlElement(namespace = "https://www.sitemaps.org/schemas/sitemap/0.9")
     protected BigDecimal priority;
     @XmlAnyElement(lax = true)
     protected List<Object> any;

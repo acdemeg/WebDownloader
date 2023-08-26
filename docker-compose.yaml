@@ -11,5 +11,4 @@ services:
     working_dir: /server
     command: "java -jar WebDownloader-1.0.0.jar"
     ports:
-      - "8002:8080"
-
+      - "8080:8080"

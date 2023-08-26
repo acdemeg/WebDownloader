@@ -137,9 +137,7 @@ class RestServiceTest {
     void discoverSizeTestSuccess(){
         var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        int size = Integer.parseInt(Objects.requireNonNull(
-                Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
-        Assertions.assertEquals(39, size / 100);
+        Assertions.assertEquals("3.92K", Objects.requireNonNull(response.getBody()).getResult());
 
     }
 

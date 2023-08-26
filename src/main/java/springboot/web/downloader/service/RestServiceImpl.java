@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -134,15 +136,18 @@ public class RestServiceImpl implements RestService {
                 return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));
 
             Path sh = Paths.get(WebDownloader.DISCOVER_SIZE_SCRIPT).toAbsolutePath();
-            int exitCode = Utils.runProcess(
-                    sh + " " + wgetLog,
+            int exitCode = Utils.runProcess(sh + " " + wgetLog,
                     NativeProcessName.DISCOVER_SIZE.name(), WebDownloader.BASE_SITES + taskId);
             if (exitCode != 0)
                 return ResponseUtils.internalServerError(ErrorMessage.INTERNAL_SERVER_ERROR.getMessage(lang));
 
             var list = FileUtils.readLines(new File(wgetLog), StandardCharsets.UTF_8);
             String byteSize = list.get(list.size() - 1);
-            return ResponseUtils.ok(byteSize);
+            NumberFormat likesShort = NumberFormat.getCompactNumberInstance(
+                    new Locale("en", "US"), NumberFormat.Style.SHORT);
+            likesShort.setMaximumFractionDigits(2);
+            String size = likesShort.format(Double.valueOf(byteSize.replace(",", ".")));
+            return ResponseUtils.ok(size);
 
         } catch (IOException | InterruptedException ex) {
             Thread.currentThread().interrupt();

@@ -59,7 +59,7 @@ public class WebTask implements Callable<StatusTask> {
     private StatusTask requireDownload() throws InterruptedException {
         try {
             int exitCode = 1;
-            String dir = WebDownloader.BASE_SITES + taskId;
+            String dir = WebDownloader.SITES + taskId;
             Utils.createDirectory(dir);
             if (wget.download(uri, dir) == 0) {
                 exitCode = zip.wrapToZip(taskId);
@@ -73,7 +73,7 @@ public class WebTask implements Callable<StatusTask> {
 
     private StatusTask estimateSize() throws InterruptedException {
         try {
-            String dir = WebDownloader.BASE_SITES + taskId;
+            String dir = WebDownloader.SITES + taskId;
             Utils.createDirectory(dir);
             int exitCode = wget.estimate(uri, dir);
             return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;

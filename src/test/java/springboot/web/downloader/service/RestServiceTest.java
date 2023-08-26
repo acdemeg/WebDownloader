@@ -7,13 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
-import springboot.web.downloader.TestUtils;
 import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.FunctionTwoArgs;
+import springboot.web.downloader.utils.Utils;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
@@ -39,12 +39,12 @@ class RestServiceTest {
 
     @BeforeAll
     static void prepareEnvTest() throws IOException {
-        TestUtils.prepareTestEnv();
+        Utils.prepareEnv();
     }
 
     @AfterAll
     static void discardEnvTest() throws IOException {
-        TestUtils.discardTestEnv();
+        Utils.discardEnv();
     }
 
     @Test

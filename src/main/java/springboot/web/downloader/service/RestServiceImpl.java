@@ -100,7 +100,7 @@ public class RestServiceImpl implements RestService {
         if (!res.getStatusCode().is2xxSuccessful()
                 || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
             return res;
-        String path = WebDownloader.BASE_ARCHIVED + taskId + ".zip";
+        String path = WebDownloader.ARCHIVED + taskId + ".zip";
         File zip = new File(path);
         if (zip.exists() && zip.isFile() && zip.canRead()) {
             return ResponseUtils.ok(path);
@@ -131,13 +131,12 @@ public class RestServiceImpl implements RestService {
             if (!res.getStatusCode().is2xxSuccessful()
                     || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
                 return res;
-            String wgetLog = WebDownloader.BASE_SITES + taskId + "/wget-log";
+            String wgetLog = WebDownloader.SITES + taskId + "/wget-log";
             if (Files.notExists(Path.of(wgetLog)))
                 return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));
 
-            Path sh = Paths.get(WebDownloader.DISCOVER_SIZE_SCRIPT).toAbsolutePath();
-            int exitCode = Utils.runProcess(sh + " " + wgetLog,
-                    NativeProcessName.DISCOVER_SIZE.name(), WebDownloader.BASE_SITES + taskId);
+            int exitCode = Utils.runProcess(Utils.DISCOVER_SIZE_SCRIPT.getAbsolutePath() + " " + wgetLog,
+                    NativeProcessName.DISCOVER_SIZE, WebDownloader.SITES + taskId);
             if (exitCode != 0)
                 return ResponseUtils.internalServerError(ErrorMessage.INTERNAL_SERVER_ERROR.getMessage(lang));
 

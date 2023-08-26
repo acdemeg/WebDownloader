@@ -8,5 +8,6 @@ public enum NativeProcessName {
     WGET_DOWNLOAD,
     WGET_ESTIMATE,
     WGET_GENERATE_SITEMAP,
-    ZIP
+    ZIP,
+    LS
 }

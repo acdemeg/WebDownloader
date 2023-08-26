@@ -1,11 +1,10 @@
 package springboot.web.downloader;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import springboot.web.downloader.utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 
 
@@ -14,20 +13,18 @@ import java.io.IOException;
 public class WebDownloader {
 
     private static final String USER_HOME = System.getProperty("user.home");
-    public static final String BASE_SITES = USER_HOME + "/sites/";
-    public static final String BASE_ARCHIVED = USER_HOME + "/archived/";
-    public static final String BASE_SITEMAPS = USER_HOME + "/sitemaps/";
+    public static final String SCRIPTS = USER_HOME + "/scripts/";
+    public static final String SITES = USER_HOME + "/sites/";
+    public static final String ARCHIVED = USER_HOME + "/archived/";
+    public static final String SITEMAPS = USER_HOME + "/sitemaps/";
     public static final String DEFAULT_LANGUAGE = "Eng";
-    public static final String DISCOVER_SIZE_SCRIPT = "./src/main/resources/discover-size.sh";
-    public static final String SITEMAP_GENERATOR_SCRIPT = "./src/main/resources/sitemap-generator.sh";
+    public static final String DISCOVER_SIZE_SH = "./src/main/resources/discover-size.sh";
+    public static final String SITEMAP_GENERATOR_SH = "./src/main/resources/sitemap-generator.sh";
     public static final String SITEMAP_XSD_HTTP = "./src/main/resources/http_sitemap.xsd";
     public static final String SITEMAP_XSD_HTTPS = "./src/main/resources/https_sitemap.xsd";
 
     public static void main(String[] args) throws IOException {
-        FileUtils.forceMkdir(new File(BASE_SITES));
-        FileUtils.forceMkdir(new File(BASE_ARCHIVED));
-        FileUtils.forceMkdir(new File(BASE_SITEMAPS));
-        log.info("Create directories if not exist");
+        Utils.prepareEnv();
         SpringApplication.run(WebDownloader.class, args);
     }
 

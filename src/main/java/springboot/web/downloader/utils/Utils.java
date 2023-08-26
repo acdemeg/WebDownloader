@@ -8,12 +8,18 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import springboot.web.downloader.WebDownloader;
+import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.wget.WgetOptions;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static springboot.web.downloader.WebDownloader.*;
+import static springboot.web.downloader.enums.NativeProcessName.DISCOVER_SIZE;
+import static springboot.web.downloader.enums.NativeProcessName.WGET_GENERATE_SITEMAP;
 
 /**
  * This class provided utils methods for logging
@@ -22,6 +28,9 @@ import java.util.List;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
+
+    public static final File DISCOVER_SIZE_SCRIPT = new File(SCRIPTS + DISCOVER_SIZE.name());
+    public static final File SITEMAP_GENERATOR_SCRIPT = new File(SCRIPTS + WGET_GENERATE_SITEMAP.name());
 
     /**
      * Common method which perform logging for standard output shell-command
@@ -62,12 +71,12 @@ public final class Utils {
      * @param workDir     working directory for run process
      * @return exit code shell-utility
      */
-    public static int runProcess(String command, final String processName, final String workDir)
+    public static int runProcess(final String command, final NativeProcessName processName, final String workDir)
             throws IOException, InterruptedException {
         log.info("Command: " + command);
         final var process = new ProcessBuilder("sh", "-c", command)
                 .directory(new File(workDir)).start();
-        Utils.logProcess(process, processName + "_Output");
+        Utils.logProcess(process, processName.name() + "_Output");
         int exitCode = process.waitFor();
         log.info("Exit code: " + exitCode);
         return exitCode;
@@ -109,5 +118,24 @@ public final class Utils {
      */
     public static int calcUrlLevel(String url) {
         return (int) url.chars().filter(ch -> ch == '/').count();
+    }
+
+    public static void prepareEnv() throws IOException {
+        log.info("Create directories if not exist");
+        FileUtils.forceMkdir(new File(SCRIPTS));
+        FileUtils.forceMkdir(new File(SITES));
+        FileUtils.forceMkdir(new File(ARCHIVED));
+        FileUtils.forceMkdir(new File(SITEMAPS));
+
+        log.info("Prepare shell script files");
+        FileUtils.copyFile(new File(WebDownloader.DISCOVER_SIZE_SH), DISCOVER_SIZE_SCRIPT);
+        FileUtils.copyFile(new File(WebDownloader.SITEMAP_GENERATOR_SH), SITEMAP_GENERATOR_SCRIPT);
+    }
+
+    public static void discardEnv() throws IOException {
+        FileUtils.cleanDirectory(new File(SCRIPTS));
+        FileUtils.cleanDirectory(new File(SITES));
+        FileUtils.cleanDirectory(new File(ARCHIVED));
+        FileUtils.cleanDirectory(new File(SITEMAPS));
     }
 }

@@ -26,8 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 @Slf4j
@@ -37,13 +35,13 @@ public class WgetImpl implements Wget {
     @Override
     public int download(final String URI, final String dir) throws InterruptedException, IOException {
         String command = WgetOptions.WGET_DOWNLOAD + URI;
-        return Utils.runProcess(command, NativeProcessName.WGET_DOWNLOAD.name(), dir);
+        return Utils.runProcess(command, NativeProcessName.WGET_DOWNLOAD, dir);
     }
 
     @Override
     public int estimate(final String URI, final String dir) throws IOException, InterruptedException {
         String command = WgetOptions.WGET_ESTIMATE + URI;
-        return Utils.runProcess(command, NativeProcessName.WGET_ESTIMATE.name(), dir);
+        return Utils.runProcess(command, NativeProcessName.WGET_ESTIMATE, dir);
     }
 
     @Override
@@ -66,11 +64,11 @@ public class WgetImpl implements Wget {
     }
 
     private String generateSitemapWithWget(final String URI, final String dir) throws IOException, InterruptedException {
-        Path sh = Paths.get(WebDownloader.SITEMAP_GENERATOR_SCRIPT).toAbsolutePath();
-        String sitemapDir = WebDownloader.BASE_SITEMAPS + dir;
+        String sitemapDir = WebDownloader.SITEMAPS + dir;
         Utils.createDirectory(sitemapDir);
-        int exitCode = Utils.runProcess(sh + " " + URI + " " + sitemapDir,
-                NativeProcessName.WGET_GENERATE_SITEMAP.name(), sitemapDir);
+        int exitCode = Utils.runProcess(
+                Utils.SITEMAP_GENERATOR_SCRIPT.getAbsolutePath() + " " + URI + " " + sitemapDir,
+                NativeProcessName.WGET_GENERATE_SITEMAP, sitemapDir);
         if (exitCode == 0) {
             File file = new File(sitemapDir + "/sitemap.xml");
             return FileUtils.readFileToString(file, StandardCharsets.UTF_8);

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(makeFinal = true)
 public class SiteMapDto extends ResponseDto implements Serializable {
+    @Serial
     @JsonIgnore
     private static final long serialVersionUID = 1L;
     private List<Node> nodes;

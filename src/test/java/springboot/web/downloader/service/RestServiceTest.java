@@ -38,7 +38,7 @@ class RestServiceTest {
     }
 
     @BeforeAll
-    static void prepareEnvTest() throws IOException, NoSuchFieldException, IllegalAccessException {
+    static void prepareEnvTest() throws IOException {
         TestUtils.prepareTestEnv();
     }
 

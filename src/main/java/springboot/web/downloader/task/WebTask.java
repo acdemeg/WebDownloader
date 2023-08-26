@@ -49,16 +49,11 @@ public class WebTask implements Callable<StatusTask> {
 
     @Override
     public StatusTask call() throws Exception {
-        switch (typeTask) {
-            case DOWNLOAD:
-                return requireDownload();
-            case ESTIMATE:
-                return estimateSize();
-            case BUILD_MAP:
-                return buildMap();
-            default:
-                return StatusTask.UNDEFINED;
-        }
+        return switch (typeTask) {
+            case DOWNLOAD -> requireDownload();
+            case ESTIMATE -> estimateSize();
+            case BUILD_MAP -> buildMap();
+        };
     }
 
     private StatusTask requireDownload() throws InterruptedException {
@@ -101,7 +96,7 @@ public class WebTask implements Callable<StatusTask> {
     }
 
     private SiteMapDto buildTree(IXmlUrlSet xmlUrlSet) {
-        List<String> urls = xmlUrlSet.getUrl().stream().map(XmlUrl::getLoc).collect(Collectors.toList());
+        List<String> urls = xmlUrlSet.getUrl().stream().map(XmlUrl::getLoc).toList();
         List<Node> nodes = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         Map<String, Set<String>> tree = new HashMap<>();
@@ -109,10 +104,10 @@ public class WebTask implements Callable<StatusTask> {
         Map<Integer, List<String>> levelUrlMap = urls.stream().collect(Collectors.groupingBy(Utils::calcUrlLevel));
         urls.forEach(root -> {
             int urlLevel = Utils.calcUrlLevel(root);
-            List<Integer> levels = levelUrlMap.keySet().stream().filter(l -> l > urlLevel).sorted().collect(Collectors.toList());
+            List<Integer> levels = levelUrlMap.keySet().stream().filter(l -> l > urlLevel).sorted().toList();
             Set<String> urlLinks = new HashSet<>();
             levels.forEach(level -> urlLinks.addAll(levelUrlMap.get(level).stream().filter(
-                    url -> url.contains(root) && urlLinks.stream().noneMatch(url::contains)).collect(Collectors.toList())));
+                    url -> url.contains(root) && urlLinks.stream().noneMatch(url::contains)).toList()));
             tree.put(root, urlLinks);
         });
         // fill nodes and edges

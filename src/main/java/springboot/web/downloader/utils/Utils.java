@@ -62,8 +62,9 @@ public final class Utils {
      * @param workDir     working directory for run process
      * @return exit code shell-utility
      */
-    public static int runProcess(final String command, final String processName, final String workDir)
+    public static int runProcess(String command, final String processName, final String workDir)
             throws IOException, InterruptedException {
+        log.info("Command: " + command);
         final var process = new ProcessBuilder("sh", "-c", command)
                 .directory(new File(workDir)).start();
         Utils.logProcess(process, processName + "_Output");

@@ -30,3 +30,4 @@ while read p; do
  esac
 done < $dir/sortedurls.txt
 echo "</urlset>" >> sitemap.xml
+

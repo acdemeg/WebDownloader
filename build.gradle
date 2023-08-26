@@ -43,4 +43,5 @@ jar {
 	manifest {
 		attributes 'Main-Class': 'springboot.web.downloader.WebDownloader'
 	}
+	enabled = false
 }

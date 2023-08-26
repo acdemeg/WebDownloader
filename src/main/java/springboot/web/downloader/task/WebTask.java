@@ -1,5 +1,6 @@
 package springboot.web.downloader.task;
 
+import lombok.extern.slf4j.Slf4j;
 import org.xml.sax.SAXException;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.dto.Edge;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  * public FunctionTwoArgs<String, String, WebTask> webTaskFactory()
  * </code>}
  */
+@Slf4j
 public class WebTask implements Callable<StatusTask> {
 
     private final Wget wget;
@@ -67,6 +69,7 @@ public class WebTask implements Callable<StatusTask> {
             Utils.wgetLogging(dir);
             return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
         } catch (IOException ex) {
+            log.error(ex.getMessage());
             return StatusTask.ERROR;
         }
     }
@@ -78,6 +81,7 @@ public class WebTask implements Callable<StatusTask> {
             int exitCode = wget.estimate(uri, dir);
             return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
         } catch (IOException ex) {
+            log.error(ex.getMessage());
             return StatusTask.ERROR;
         }
     }
@@ -91,6 +95,7 @@ public class WebTask implements Callable<StatusTask> {
             TaskRegistry.getResults().put(taskId, siteMap);
             return StatusTask.DONE;
         } catch (IOException | JAXBException | SAXException ex) {
+            log.error(ex.getMessage());
             return StatusTask.ERROR;
         }
     }

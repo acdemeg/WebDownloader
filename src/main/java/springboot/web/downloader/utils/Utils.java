@@ -5,10 +5,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.wget.WgetOptions;
 
@@ -92,6 +92,7 @@ public final class Utils {
         try {
             return getResponse(URI);
         } catch (Exception ex) {
+            log.error(ex.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
@@ -128,8 +129,15 @@ public final class Utils {
         FileUtils.forceMkdir(new File(SITEMAPS));
 
         log.info("Prepare shell script files");
-        FileUtils.copyFile(new File(WebDownloader.DISCOVER_SIZE_SH), DISCOVER_SIZE_SCRIPT);
-        FileUtils.copyFile(new File(WebDownloader.SITEMAP_GENERATOR_SH), SITEMAP_GENERATOR_SCRIPT);
+        ClassPathResource discoverSize = new ClassPathResource("discover-size.sh");
+        ClassPathResource sitemapGenerator = new ClassPathResource("sitemap-generator.sh");
+        FileUtils.writeByteArrayToFile(DISCOVER_SIZE_SCRIPT, discoverSize.getContentAsByteArray());
+        FileUtils.writeByteArrayToFile(SITEMAP_GENERATOR_SCRIPT, sitemapGenerator.getContentAsByteArray());
+        boolean successDiscoverSize = DISCOVER_SIZE_SCRIPT.setExecutable(true);
+        boolean successSiteMapGenerator = SITEMAP_GENERATOR_SCRIPT.setExecutable(true);
+        if (!(successSiteMapGenerator && successDiscoverSize)) {
+            throw new IOException("Impossible give permission on execution");
+        }
     }
 
     public static void discardEnv() throws IOException {

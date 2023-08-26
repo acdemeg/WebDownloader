@@ -2,6 +2,7 @@ package springboot.web.downloader.wget;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,11 +52,13 @@ public class WgetImpl implements Wget {
             ResponseEntity<String> entity = Utils.getResponse(URI + "sitemap.xml");
             return unmarshallingSitemapXml(entity.getBody());
         } catch (final Exception ex) {
+            log.info(ex.getMessage());
             try {
                 // priority 2: /root-domain/(url from robots.txt)
                 String sitemap = getSiteMapFromRobotsTxt(URI);
                 return unmarshallingSitemapXml(sitemap);
             } catch (Exception ex2) {
+                log.info(ex.getMessage());
                 // priority 3: generating sitemap.xml using WGET
                 String generatedSitemap = generateSitemapWithWget(URI, dir);
                 return unmarshallingSitemapXml(generatedSitemap);
@@ -94,14 +97,16 @@ public class WgetImpl implements Wget {
 
     private IXmlUrlSet unmarshallingSitemapXml(String body) throws JAXBException {
         if (body == null || body.isEmpty()) {
+            log.error("Xml body must be not null and not empty");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Xml body must be not null and not empty");
         }
-        boolean isHttp = validateXml(body, WebDownloader.SITEMAP_XSD_HTTP);
+        boolean isHttp = validateXml(body, "http_sitemap.xsd");
         boolean isHttps = false;
         if(!isHttp) {
-            isHttps = validateXml(body, WebDownloader.SITEMAP_XSD_HTTPS);
+            isHttps = validateXml(body, "https_sitemap.xsd");
         }
         if (!(isHttp || isHttps)) {
+            log.error("Xml validation error");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Xml validation error");
         }
         Class<?> clazz = isHttp ? XmlUrlSetHttp.class : XmlUrlSetHttps.class;
@@ -118,16 +123,18 @@ public class WgetImpl implements Wget {
     }
 
     @SuppressWarnings("java:S2755")
-    private boolean validateXml(String body, String schemaPath) {
+    private boolean validateXml(String body, String schemaName) {
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Source schemaFile = new StreamSource(FileUtils.getFile(schemaPath));
+            ClassPathResource resource = new ClassPathResource(schemaName);
+            Source schemaFile = new StreamSource(resource.getInputStream());
             Schema schema = factory.newSchema(schemaFile);
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(body))); // Else StreamClosed Exception!
             return true;
         }
         catch (Exception ex) {
+            log.error(ex.getMessage());
             return false;
         }
     }

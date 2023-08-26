@@ -232,6 +232,6 @@ class RestServiceTest {
     private void queryWithClientUrlError(final Function<String, ResponseEntity<?>> rest) {
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> rest.apply("https://unreacheble-XXX-url.guru/"));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     }
 }

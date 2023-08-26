@@ -25,6 +25,6 @@ class UtilsTest {
         Assertions.assertEquals(HttpStatus.OK, success.getStatusCode());
         ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> Utils.isLiveConnection("https://unreacheble-XXX-url.guru/"));
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     }
 }

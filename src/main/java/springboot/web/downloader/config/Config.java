@@ -2,7 +2,6 @@ package springboot.web.downloader.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -12,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springboot.web.downloader.enums.TypeTask;
 import springboot.web.downloader.task.WebTask;
 import springboot.web.downloader.utils.FunctionManyArgs;
-import springboot.web.downloader.utils.LoggableHttpTraceRepository;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
 
@@ -32,17 +30,6 @@ public class Config {
     public Config(Wget wget, Zip zip) {
         this.wget = wget;
         this.zip = zip;
-    }
-
-    /**
-     * Bean is repository which keeping last 100 http-request
-     * and presenting logging ability in separate file
-     *
-     * @return {@code HttpTrace} repository
-     */
-    @Bean
-    public HttpTraceRepository httpTraceRepository() {
-        return new LoggableHttpTraceRepository();
     }
 
     /**

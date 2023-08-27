@@ -5,7 +5,10 @@ also creating site mirror, graph-map of site, estimate of size
 web-site(static resources) etc. Based on WGET utility.
 
 ## DEMO
-http://devproject.site/
+http://devproject.site:8002
+
+## DockerHub
+https://hub.docker.com/repository/docker/acdemeg/web-downloader/general
 
 ## Requirements
 1. Java 17.x or higher

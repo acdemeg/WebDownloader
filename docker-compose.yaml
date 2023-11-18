@@ -9,6 +9,6 @@ services:
       dockerfile: ./Dockerfile
     tty: true
     working_dir: /server
-    command: "java -jar WebDownloader-1.0.0.jar"
+    command: "java -jar WebDownloader.jar"
     ports:
       - "8080:8080"

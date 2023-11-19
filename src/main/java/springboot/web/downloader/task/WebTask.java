@@ -9,8 +9,8 @@ import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.NodeType;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.enums.TypeTask;
+import springboot.web.downloader.jaxb.IXmlUrl;
 import springboot.web.downloader.jaxb.IXmlUrlSet;
-import springboot.web.downloader.jaxb.http.XmlUrl;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
@@ -101,7 +101,7 @@ public class WebTask implements Callable<StatusTask> {
     }
 
     private SiteMapDto buildTree(IXmlUrlSet xmlUrlSet) {
-        List<String> urls = xmlUrlSet.getUrl().stream().map(XmlUrl::getLoc).toList();
+        List<String> urls = xmlUrlSet.getUrl().stream().map(IXmlUrl::getLoc).toList();
         List<Node> nodes = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         Map<String, Set<String>> tree = new HashMap<>();

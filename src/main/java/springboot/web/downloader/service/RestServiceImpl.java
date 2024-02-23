@@ -141,9 +141,9 @@ public class RestServiceImpl implements RestService {
                 return ResponseUtils.internalServerError(ErrorMessage.INTERNAL_SERVER_ERROR.getMessage(lang));
 
             var list = FileUtils.readLines(new File(wgetLog), StandardCharsets.UTF_8);
-            String byteSize = list.get(list.size() - 1);
+            String byteSize = list.getLast();
             NumberFormat likesShort = NumberFormat.getCompactNumberInstance(
-                    new Locale("en", "US"), NumberFormat.Style.SHORT);
+                    Locale.of("en", "US"), NumberFormat.Style.SHORT);
             likesShort.setMaximumFractionDigits(2);
             String size = likesShort.format(Double.valueOf(byteSize.replace(",", ".")));
             return ResponseUtils.ok(size);
@@ -167,10 +167,11 @@ public class RestServiceImpl implements RestService {
 
     private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask typeTask) {
         String taskId = UUID.randomUUID().toString();
-        final var exec = Executors.newSingleThreadExecutor();
-        final var future = exec.submit(webTaskFactory.apply(taskId, URI, typeTask));
-        TaskRegistry.getRegistry().put(taskId, future);
-        exec.shutdown();
-        return ResponseUtils.ok(taskId);
+        try(final var exec = Executors.newVirtualThreadPerTaskExecutor()) {
+            final var future = exec.submit(webTaskFactory.apply(taskId, URI, typeTask));
+            TaskRegistry.getRegistry().put(taskId, future);
+            exec.shutdown();
+            return ResponseUtils.ok(taskId);
+        }
     }
 }

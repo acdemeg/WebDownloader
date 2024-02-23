@@ -11,8 +11,8 @@ http://devproject.site:8002
 https://hub.docker.com/repository/docker/acdemeg/web-downloader/general
 
 ## Requirements
-1. Java 17.x or higher
-2. Gradle 7.x or higher
+1. Java 21 or higher
+2. Gradle 8.5 or higher
 3. Docker, Docker-compose
 4. Linux, Wget package
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.annotations.CheckUriConnection;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.enums.StatusTask;
@@ -22,11 +23,14 @@ import springboot.web.downloader.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -37,7 +41,6 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 public class RestServiceImpl implements RestService {
 
     private final FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory;
-    public static final String DISCOVER_SIZE_SCRIPT = "./src/main/resources/discover-size.sh";
 
     @Autowired
     public RestServiceImpl(FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory) {
@@ -59,8 +62,18 @@ public class RestServiceImpl implements RestService {
     @Override
     @CheckUriConnection
     public ResponseEntity<ResponseDto> mapSite(final String URI) {
-        String taskId = UUID.randomUUID().toString();
-        return ResponseUtils.ok(taskId);
+        return runWebTask(URI, TypeTask.BUILD_MAP);
+    }
+
+    @Override
+    public ResponseEntity<ResponseDto> getJsonGraph(final String taskId, final String lang) {
+        ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
+        if (!res.getStatusCode().is2xxSuccessful()
+                || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
+            return res;
+
+        Serializable siteMap = TaskRegistry.getResults().get(taskId);
+        return ResponseUtils.ok((SiteMapDto) siteMap);
     }
 
     @Override
@@ -83,16 +96,11 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<ResponseDto> find(final String taskId, final String lang) {
-
         ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
-        if (!res.getStatusCode().is2xxSuccessful())
+        if (!res.getStatusCode().is2xxSuccessful()
+                || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
             return res;
-
-        ResponseEntity<ResponseDto> response = this.statusTask(taskId, lang);
-        if (!Objects.equals(Objects.requireNonNull(response.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
-            return response;
-
-        String path = WebDownloader.BASE_ARCHIVED + taskId + ".zip";
+        String path = WebDownloader.ARCHIVED + taskId + ".zip";
         File zip = new File(path);
         if (zip.exists() && zip.isFile() && zip.canRead()) {
             return ResponseUtils.ok(path);
@@ -102,7 +110,6 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<Resource> getZip(final String fileName) throws NoSuchFileException {
-
         File zip = new File(fileName);
         if(!zip.exists()) {
             throw new NoSuchFileException(fileName);
@@ -121,30 +128,31 @@ public class RestServiceImpl implements RestService {
     public ResponseEntity<ResponseDto> getSize(final String taskId, final String lang) {
         try {
             ResponseEntity<ResponseDto> res = getStatusTask(taskId, lang);
-            if (!res.getStatusCode().is2xxSuccessful())
+            if (!res.getStatusCode().is2xxSuccessful()
+                    || !Objects.equals(Objects.requireNonNull(res.getBody()).getResult(), StatusTask.DONE.getStatus(lang)))
                 return res;
-
-            String wgetLog = WebDownloader.BASE_SITES + taskId + "/wget-log";
+            String wgetLog = WebDownloader.SITES + taskId + "/wget-log";
             if (Files.notExists(Path.of(wgetLog)))
                 return ResponseUtils.notFound(ErrorMessage.FILE_NOT_FOUND.getMessage(lang));
 
-            Path sh = Paths.get(DISCOVER_SIZE_SCRIPT).toAbsolutePath();
-            int exitCode = Utils.runProcess(
-                    sh + " " + wgetLog,
-                    NativeProcessName.DISCOVER_SIZE.name(), WebDownloader.BASE_SITES + taskId);
+            int exitCode = Utils.runProcess(Utils.DISCOVER_SIZE_SCRIPT.getAbsolutePath() + " " + wgetLog,
+                    NativeProcessName.DISCOVER_SIZE, WebDownloader.SITES + taskId);
             if (exitCode != 0)
                 return ResponseUtils.internalServerError(ErrorMessage.INTERNAL_SERVER_ERROR.getMessage(lang));
 
             var list = FileUtils.readLines(new File(wgetLog), StandardCharsets.UTF_8);
-            String byteSize = list.get(list.size() - 1);
-            return ResponseUtils.ok(byteSize);
+            String byteSize = list.getLast();
+            NumberFormat likesShort = NumberFormat.getCompactNumberInstance(
+                    Locale.of("en", "US"), NumberFormat.Style.SHORT);
+            likesShort.setMaximumFractionDigits(2);
+            String size = likesShort.format(Double.valueOf(byteSize.replace(",", ".")));
+            return ResponseUtils.ok(size);
 
         } catch (IOException | InterruptedException ex) {
             Thread.currentThread().interrupt();
             return ResponseUtils.internalServerError(ex.getMessage());
         }
     }
-
 
     private ResponseEntity<ResponseDto> getStatusTask(final String taskId, final String lang) {
         ResponseEntity<ResponseDto> response = this.statusTask(taskId, lang);
@@ -157,12 +165,13 @@ public class RestServiceImpl implements RestService {
         return response;
     }
 
-    private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask estimate) {
+    private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask typeTask) {
         String taskId = UUID.randomUUID().toString();
-        final var exec = Executors.newSingleThreadExecutor();
-        final var future = exec.submit(webTaskFactory.apply(taskId, URI, estimate));
-        TaskRegistry.getRegistry().put(taskId, future);
-        exec.shutdown();
-        return ResponseUtils.ok(taskId);
+        try(final var exec = Executors.newVirtualThreadPerTaskExecutor()) {
+            final var future = exec.submit(webTaskFactory.apply(taskId, URI, typeTask));
+            TaskRegistry.getRegistry().put(taskId, future);
+            exec.shutdown();
+            return ResponseUtils.ok(taskId);
+        }
     }
 }

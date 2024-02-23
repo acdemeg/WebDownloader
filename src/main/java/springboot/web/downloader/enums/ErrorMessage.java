@@ -1,8 +1,11 @@
 package springboot.web.downloader.enums;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * This class represent error messages
  */
+@RequiredArgsConstructor
 public enum ErrorMessage {
     TASK_NOT_FOUND("Task not found", "Задача не найдена"),
     INTERNAL_SERVER_ERROR("Internal server error", "Ошибка сервера"),
@@ -11,11 +14,6 @@ public enum ErrorMessage {
 
     private final String eng;
     private final String rus;
-
-    ErrorMessage(final String Eng, final String Rus) {
-        this.eng = Eng;
-        this.rus = Rus;
-    }
 
     public String getMessage(final String lang) {
         return (lang.equals("Eng")) ? this.eng : this.rus;

@@ -7,5 +7,7 @@ public enum NativeProcessName {
     DISCOVER_SIZE,
     WGET_DOWNLOAD,
     WGET_ESTIMATE,
-    ZIP
+    WGET_GENERATE_SITEMAP,
+    ZIP,
+    LS
 }

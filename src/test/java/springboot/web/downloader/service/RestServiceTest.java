@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springboot.web.downloader.TestUtils;
+import org.springframework.web.server.ResponseStatusException;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.dto.SiteMapDto;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.registory.TaskRegistry;
 import springboot.web.downloader.utils.FunctionTwoArgs;
+import springboot.web.downloader.utils.Utils;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
@@ -36,23 +38,29 @@ class RestServiceTest {
     }
 
     @BeforeAll
-    static void prepareEnvTest() throws IOException, NoSuchFieldException, IllegalAccessException {
-        TestUtils.prepareTestEnv();
+    static void prepareEnvTest() throws IOException {
+        Utils.prepareEnv();
     }
 
     @AfterAll
     static void discardEnvTest() throws IOException {
-        TestUtils.discardTestEnv();
+        Utils.discardEnv();
     }
 
     @Test
-    @Order(1)
+    @Order(10)
     void requireDownloadSuccess() throws InterruptedException, ExecutionException {
-        queryWithClientUrlSuccess(this.restService::requireDownload);
+        queryWithClientUrlSuccess(this.restService::requireDownload, "https://locallhost.com/");
     }
 
     @Test
-    @Order(2)
+    @Order(10)
+    void requireDownloadError() {
+        queryWithClientUrlError(this.restService::requireDownload);
+    }
+
+    @Test
+    @Order(20)
     void getZipSuccess() throws NoSuchFileException {
         final var res1 = this.restService.find(taskId, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.OK, res1.getStatusCode());
@@ -63,7 +71,7 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(20)
     void getZipError() {
         Exception thrown = Assertions.assertThrows(
                 NoSuchFileException.class,
@@ -73,8 +81,64 @@ class RestServiceTest {
     }
 
     @Test
-    void requireDownloadError() {
-        queryWithClientUrlError(this.restService::requireDownload);
+    @Order(30)
+    void buildMapSiteError() {
+        queryWithClientUrlError(this.restService::mapSite);
+    }
+
+    @Test
+    @Order(30)
+    void buildMapSiteSuccessOne() throws ExecutionException, InterruptedException {
+        queryWithClientUrlSuccess(this.restService::mapSite, "https://java-course.ru/");
+    }
+
+    @Test
+    @Order(31)
+    void getJsonGraphSuccessOne() {
+        final var res = this.restService.getJsonGraph(taskId, DEFAULT_LANGUAGE);
+        SiteMapDto siteMap = (SiteMapDto) res.getBody();
+        Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
+        Assertions.assertNotNull(siteMap);
+        Assertions.assertEquals(75, siteMap.getNodes().size());
+        Assertions.assertEquals(74, siteMap.getEdges().size());
+    }
+
+    @Test
+    @Order(32)
+    void buildMapSiteSuccessTwo() throws ExecutionException, InterruptedException {
+        queryWithClientUrlSuccess(this.restService::mapSite, "https://locallhost.com/");
+    }
+
+    @Test
+    @Order(33)
+    void getJsonGraphSuccessTwo() {
+        final var res = this.restService.getJsonGraph(taskId, DEFAULT_LANGUAGE);
+        SiteMapDto siteMap = (SiteMapDto) res.getBody();
+        Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
+        Assertions.assertNotNull(siteMap);
+        Assertions.assertEquals(1, siteMap.getNodes().size());
+        Assertions.assertEquals(0, siteMap.getEdges().size());
+    }
+
+    @Test
+    @Order(40)
+    void getJsonGraphError() {
+        notFoundTest(this.restService::getJsonGraph);
+    }
+
+    @Test
+    @Order(50)
+    void estimateSizeSuccess() throws InterruptedException, ExecutionException {
+        queryWithClientUrlSuccess(this.restService::estimateSize, "https://locallhost.com/");
+    }
+
+    @Test
+    @Order(60)
+    void discoverSizeTestSuccess(){
+        var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals("3.92K", Objects.requireNonNull(response.getBody()).getResult());
+
     }
 
     @Test
@@ -137,23 +201,6 @@ class RestServiceTest {
     }
 
     @Test
-    @Order(4)
-    void estimateSizeSuccess() throws InterruptedException, ExecutionException {
-        queryWithClientUrlSuccess(this.restService::estimateSize);
-    }
-
-    @Test
-    @Order(5)
-    void discoverSizeTestSuccess(){
-        var response = this.restService.getSize(taskId, DEFAULT_LANGUAGE);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        int size = Integer.parseInt(Objects.requireNonNull(
-                Objects.requireNonNull(response.getBody()).getResult()).substring(0,4));
-        Assertions.assertEquals(39, size / 100);
-
-    }
-
-    @Test
     void discoverSizeTestFileNotFound() throws ExecutionException, InterruptedException {
         final String task = this.prepareMockTask(true, StatusTask.DONE, false);
         var response = this.restService.getSize(task, DEFAULT_LANGUAGE);
@@ -169,9 +216,8 @@ class RestServiceTest {
         queryWithClientUrlError(this.restService::estimateSize);
     }
 
-    private void queryWithClientUrlSuccess(final Function<String, ResponseEntity<ResponseDto>> rest)
+    private void queryWithClientUrlSuccess(final Function<String, ResponseEntity<ResponseDto>> rest, String successUrl)
             throws InterruptedException, ExecutionException {
-        String successUrl = "https://locallhost.com/";
         final var response = rest.apply(successUrl);
         taskId = Objects.requireNonNull(Objects.requireNonNull(response.getBody()).getResult());
         final var future = TaskRegistry.getRegistry().get(taskId);
@@ -182,11 +228,8 @@ class RestServiceTest {
     }
 
     private void queryWithClientUrlError(final Function<String, ResponseEntity<?>> rest) {
-        String errorUrl = "https://unreacheble-XXX-url.guru/";
-        final var response = rest.apply(errorUrl);
-        ResponseDto responseDto = Objects.requireNonNull((ResponseDto) response.getBody());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), responseDto.getStatusCode());
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> rest.apply("https://unreacheble-XXX-url.guru/"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     }
-
 }

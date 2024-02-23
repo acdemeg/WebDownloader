@@ -3,6 +3,7 @@ package springboot.web.downloader.service;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import springboot.web.downloader.dto.ResponseDto;
+import springboot.web.downloader.enums.StatusTask;
 
 import java.nio.file.NoSuchFileException;
 
@@ -40,6 +41,14 @@ public interface RestService {
     ResponseEntity<ResponseDto> mapSite(final String URI);
 
     /**
+     * This method allow to get json graph which represent hierarchical site structure
+     * if /map method completed successfully before
+     * @param taskId task identifier received from client
+     * @return json graph for UI render
+     */
+    ResponseEntity<ResponseDto> getJsonGraph(final String taskId, final String lang);
+
+    /**
      * This method allow download zip archive as octet-stream
      *
      * @param fileName name of zip-archive file
@@ -59,7 +68,7 @@ public interface RestService {
      * This method allow monitoring status web-task
      *
      * @param taskId task identifier received from client
-     * @return status task (DONE, ERROR, RUNNING, UNDEFINED)
+     * @return status task {@link StatusTask}
      */
     ResponseEntity<ResponseDto> statusTask(final String taskId, final String lang);
 

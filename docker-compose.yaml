@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  web:
+    image: acdemeg/web-downloader:1.0.0
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    tty: true
+    working_dir: /server
+    command: "java -jar WebDownloader.jar"
+    volumes:
+      - ~/logs/web-downloader:/server/logs
+    ports:
+      - "8080:8080"

@@ -1,13 +1,23 @@
 package springboot.web.downloader.dto;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ResponseDto {
-    private Integer statusCode;
-    private String result;
+@NoArgsConstructor(force = true)
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+public class ResponseDto implements Serializable {
+    @Serial
+    @JsonIgnore
+    private static final long serialVersionUID = 5L;
+    Integer statusCode;
+    String result;
 }

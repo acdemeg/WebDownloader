@@ -63,4 +63,11 @@ public class Rest {
         return this.restService.mapSite(URI);
     }
 
+    @GetMapping(path = "/graph", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> getGraph(
+            @RequestParam(value = "taskId") final String taskId,
+            @RequestParam(value = "lang", defaultValue = "Eng", required = false) final String lang) {
+        return this.restService.getJsonGraph(taskId, lang);
+    }
+
 }

@@ -4,8 +4,10 @@ plugins {
 	id 'java'
 }
 
+def appVersion = '1.0.0'
+
 group = 'springboot.web'
-version = '1.0.0'
+version = appVersion
 sourceCompatibility = '17'
 
 configurations {
@@ -16,6 +18,16 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+springBoot {
+	buildInfo {
+		properties {
+			artifact = 'WebDownloader.jar'
+			version = appVersion
+			excludes = ['time', 'group', 'name']
+		}
+	}
 }
 
 dependencies {

@@ -3,7 +3,7 @@ name: Publish Docker image
 on:
   workflow_dispatch:
   release:
-    types: [published]
+    types: [created]
 
 jobs:
   push_to_registry:
@@ -12,6 +12,13 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+        run: 'mkdir -p build/libs'
+
+      - name: Fetch artifact
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          file: 'WebDownloader.jar'
+          target: './build/libs'
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a

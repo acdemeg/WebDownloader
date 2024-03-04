@@ -23,5 +23,4 @@ public class WebDownloader {
         Utils.prepareEnv();
         SpringApplication.run(WebDownloader.class, args);
     }
-
 }

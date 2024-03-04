@@ -49,7 +49,9 @@ public class Config {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**");
+                registry
+                    .addMapping("/**")
+                    .allowedOrigins("http://devproject.site/**", "http://localhost/**");
             }
         };
     }

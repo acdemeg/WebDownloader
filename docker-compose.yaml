@@ -10,5 +10,7 @@ services:
     tty: true
     working_dir: /server
     command: "java -jar WebDownloader.jar"
+    volumes:
+      - ~/logs/web-downloader:/server/logs
     ports:
       - "8080:8080"

@@ -3,7 +3,7 @@ name: Docker
 on:
   workflow_dispatch:
   release:
-    types: [created]
+    types: [released]
 
 jobs:
   push_to_registry:

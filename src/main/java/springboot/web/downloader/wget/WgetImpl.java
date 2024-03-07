@@ -1,6 +1,5 @@
 package springboot.web.downloader.wget;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -49,53 +48,30 @@ public class WgetImpl implements Wget {
     @Override
     public IXmlUrlSet getSiteMap(final String URI, final String dir) throws IOException, InterruptedException, JAXBException {
         try {
-            // priority 1: /root-domain/sitemap_index.xml
-            return getSiteMapIndexOriginal(URI);
+            // priority 1: /root-domain/sitemap.xml
+            ResponseEntity<String> entity = Utils.getResponse(URI + "sitemap.xml");
+            return unmarshallingSitemapXml(entity.getBody());
         } catch (final Exception ex) {
             log.info(ex.getMessage());
             try {
-                // priority 2: /root-domain/sitemap.xml
-                return getSiteMapOriginal(URI + "sitemap.xml");
-            } catch (final Exception ex2) {
-                log.info(ex2.getMessage());
-                try {
-                    // priority 3: /root-domain/(url from robots.txt)
-                    String sitemap = getSiteMapFromRobotsTxt(URI);
-                    return unmarshallingSitemapXml(sitemap);
-                } catch (Exception ex3) {
-                    log.info(ex3.getMessage());
-                    // priority 4: generating sitemap.xml using WGET
-                    String generatedSitemap = generateSitemapWithWget(URI, dir);
-                    return unmarshallingSitemapXml(generatedSitemap);
-                }
+                // priority 2: /root-domain/(url from robots.txt)
+                String sitemap = getSiteMapFromRobotsTxt(URI);
+                return unmarshallingSitemapXml(sitemap);
+            } catch (Exception ex2) {
+                log.info(ex.getMessage());
+                // priority 3: generating sitemap.xml using WGET
+                String generatedSitemap = generateSitemapWithWget(URI, dir);
+                return unmarshallingSitemapXml(generatedSitemap);
             }
         }
-    }
-
-    @SneakyThrows
-    private IXmlUrlSet getSiteMapOriginal(final String URI) {
-        ResponseEntity<String> entity = Utils.getResponse(URI);
-        return unmarshallingSitemapXml(entity.getBody());
-    }
-
-    private IXmlUrlSet getSiteMapIndexOriginal(final String URI) throws JAXBException {
-        ResponseEntity<String> siteMapIndex = Utils.getResponse(URI + "sitemap_index.xml");
-        IXmlUrlSet indexUrlSet = unmarshallingSitemapXml(siteMapIndex.getBody());
-        return indexUrlSet.getUrl().stream()
-            .map(xmlUrl -> getSiteMapOriginal(xmlUrl.getLoc()))
-            .collect(
-                IXmlUrlSet.getImpl(indexUrlSet),
-                (iXmlUrlSet, iXmlUrlSet2) -> indexUrlSet.getUrl().addAll(iXmlUrlSet2.getUrl()),
-                (iXmlUrlSet, iXmlUrlSet2) -> indexUrlSet.getUrl().addAll(iXmlUrlSet2.getUrl())
-            );
     }
 
     private String generateSitemapWithWget(final String URI, final String dir) throws IOException, InterruptedException {
         String sitemapDir = WebDownloader.SITEMAPS + dir;
         Utils.createDirectory(sitemapDir);
         int exitCode = Utils.runProcess(
-            Utils.SITEMAP_GENERATOR_SCRIPT.getAbsolutePath() + " " + URI + " " + sitemapDir,
-            NativeProcessName.WGET_GENERATE_SITEMAP, sitemapDir);
+                Utils.SITEMAP_GENERATOR_SCRIPT.getAbsolutePath() + " " + URI + " " + sitemapDir,
+                NativeProcessName.WGET_GENERATE_SITEMAP, sitemapDir);
         if (exitCode == 0) {
             File file = new File(sitemapDir + "/sitemap.xml");
             return FileUtils.readFileToString(file, StandardCharsets.UTF_8);
@@ -109,7 +85,7 @@ public class WgetImpl implements Wget {
             return "";
         }
         String sitemapLine = Arrays.stream(robotsBody.split("\n")).filter(line ->
-            line.toLowerCase().startsWith("sitemap")).findFirst().orElse("");
+                line.toLowerCase().startsWith("sitemap")).findFirst().orElse("");
         int start = sitemapLine.toLowerCase().indexOf("http");
         String sitemapAddress = start > -1 ? sitemapLine.substring(start) : "";
         if (sitemapAddress.isEmpty()) {
@@ -126,7 +102,7 @@ public class WgetImpl implements Wget {
         }
         boolean isHttp = validateXml(body, "http_sitemap.xsd");
         boolean isHttps = false;
-        if (!isHttp) {
+        if(!isHttp) {
             isHttps = validateXml(body, "https_sitemap.xsd");
         }
         if (!(isHttp || isHttps)) {
@@ -156,7 +132,8 @@ public class WgetImpl implements Wget {
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(new StringReader(body))); // Else StreamClosed Exception!
             return true;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             log.error(ex.getMessage());
             return false;
         }

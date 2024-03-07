@@ -1,8 +1,6 @@
 
 package springboot.web.downloader.jaxb.http;
 
-import springboot.web.downloader.jaxb.IXmlUrl;
-
 import javax.annotation.processing.Generated;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -41,7 +39,7 @@ public class XmlUrlSetHttp implements springboot.web.downloader.jaxb.IXmlUrlSet 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
     @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9", required = true)
-    protected List<IXmlUrl> url;
+    protected List<XmlUrl> url;
 
     /**
      * Gets the value of the any property.
@@ -90,12 +88,12 @@ public class XmlUrlSetHttp implements springboot.web.downloader.jaxb.IXmlUrlSet 
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link XmlUrlHttp }
+     * {@link XmlUrl }
      *
      *
      */
     @Override
-    public List<IXmlUrl> getUrl() {
+    public List<XmlUrl> getUrl() {
         if (url == null) {
             url = new ArrayList<>();
         }

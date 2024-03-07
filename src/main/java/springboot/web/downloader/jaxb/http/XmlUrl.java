@@ -44,7 +44,7 @@ import java.util.List;
     "any"
 })
 @Generated({})
-public class XmlUrlHttp implements springboot.web.downloader.jaxb.IXmlUrl {
+public class XmlUrl {
 
     @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9", required = true)
     @XmlSchemaType(name = "anyURI")
@@ -53,7 +53,7 @@ public class XmlUrlHttp implements springboot.web.downloader.jaxb.IXmlUrl {
     protected String lastmod;
     @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
     @XmlSchemaType(name = "string")
-    protected XmlChangeFreqHttp changefreq;
+    protected XmlChangeFreq changefreq;
     @XmlElement(namespace = "http://www.sitemaps.org/schemas/sitemap/0.9")
     protected BigDecimal priority;
     @XmlAnyElement(lax = true)
@@ -67,7 +67,6 @@ public class XmlUrlHttp implements springboot.web.downloader.jaxb.IXmlUrl {
      *     {@link String }
      *     
      */
-    @Override
     public String getLoc() {
         return loc;
     }
@@ -113,10 +112,10 @@ public class XmlUrlHttp implements springboot.web.downloader.jaxb.IXmlUrl {
      * 
      * @return
      *     possible object is
-     *     {@link XmlChangeFreqHttp }
+     *     {@link XmlChangeFreq }
      *     
      */
-    public XmlChangeFreqHttp getChangefreq() {
+    public XmlChangeFreq getChangefreq() {
         return changefreq;
     }
 
@@ -125,10 +124,10 @@ public class XmlUrlHttp implements springboot.web.downloader.jaxb.IXmlUrl {
      * 
      * @param value
      *     allowed object is
-     *     {@link XmlChangeFreqHttp }
+     *     {@link XmlChangeFreq }
      *     
      */
-    public void setChangefreq(XmlChangeFreqHttp value) {
+    public void setChangefreq(XmlChangeFreq value) {
         this.changefreq = value;
     }
 

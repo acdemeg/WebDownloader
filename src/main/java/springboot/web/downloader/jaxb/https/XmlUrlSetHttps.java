@@ -1,8 +1,6 @@
 
 package springboot.web.downloader.jaxb.https;
 
-import springboot.web.downloader.jaxb.IXmlUrl;
-
 import javax.annotation.processing.Generated;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -36,12 +34,12 @@ import java.util.List;
 })
 @XmlRootElement(name = "urlset", namespace = "https://www.sitemaps.org/schemas/sitemap/0.9")
 @Generated({})
-public class XmlUrlSetHttps implements springboot.web.downloader.jaxb.IXmlUrlSet {
+public class XmlUrlSetHttps {
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
     @XmlElement(namespace = "https://www.sitemaps.org/schemas/sitemap/0.9", required = true)
-    protected List<IXmlUrl> url;
+    protected List<XmlUrl> url;
 
     /**
      * Gets the value of the any property.
@@ -90,11 +88,11 @@ public class XmlUrlSetHttps implements springboot.web.downloader.jaxb.IXmlUrlSet
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link XmlUrlHttps }
+     * {@link XmlUrl }
      *
      *
      */
-    public List<IXmlUrl> getUrl() {
+    public List<XmlUrl> getUrl() {
         if (url == null) {
             url = new ArrayList<>();
         }

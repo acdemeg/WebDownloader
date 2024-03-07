@@ -14,10 +14,12 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Get latest release tag
-        run: |
-          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+      - name: Set env
+        run: echo "LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
 
       - name: Fetch artifact
         uses: dsaltares/fetch-gh-release-asset@master
@@ -45,7 +47,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: $LATEST_TAG
+          tags: acdemeg/web-downloader:${{ env.LATEST_TAG }}
 
       - name: Executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.0.3
@@ -63,7 +65,7 @@ jobs:
             echo '--- REMOVE OLD VERSION ---';
             docker system prune --all --force;
             echo '--- GET NEW VERSION ---';
-            export TAG=$LATEST_TAG
+            export TAG=${{ env.LATEST_TAG }}
             echo $TAG
             docker-compose up --no-build -d;
             echo '--- LIST OF DOCKER CONTAINERS AFTER STARTING DOCKER CONTAINERS ---';

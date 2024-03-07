@@ -60,6 +60,8 @@ jobs:
             echo '--- REMOVE OLD VERSION ---';
             docker system prune --all --force;
             echo '--- GET NEW VERSION ---';
+            export TAG=${{ steps.meta.outputs.tags }}
+            echo $TAG
             docker-compose up --no-build -d;
             echo '--- LIST OF DOCKER CONTAINERS AFTER STARTING DOCKER CONTAINERS ---';
             docker ps -a;

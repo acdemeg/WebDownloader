@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   web:
-    image: acdemeg/web-downloader:1.0.0
+    image: acdemeg/web-downloader:${TAG}
     restart: always
     build:
       context: .

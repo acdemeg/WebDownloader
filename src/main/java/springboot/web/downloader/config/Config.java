@@ -9,11 +9,12 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import springboot.web.downloader.enums.TypeTask;
+import springboot.web.downloader.dto.Task;
 import springboot.web.downloader.task.WebTask;
-import springboot.web.downloader.utils.FunctionManyArgs;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
+
+import java.util.function.Function;
 
 /**
  * This class contain beans definitions
@@ -40,7 +41,7 @@ public class Config {
      * @return function interface for many arguments
      */
     @Bean
-    public FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory() {
+    public Function<Task, WebTask> webTaskFactory() {
         return this::webTaskWithParam;
     }
 
@@ -59,7 +60,7 @@ public class Config {
     @Bean
     @Scope(value = "prototype")
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public WebTask webTaskWithParam(String taskId, String uri, TypeTask typeTask) {
-        return new WebTask(wget, zip, taskId, uri, typeTask);
+    public WebTask webTaskWithParam(Task task) {
+        return new WebTask(wget, zip, task);
     }
 }

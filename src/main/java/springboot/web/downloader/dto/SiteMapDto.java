@@ -10,6 +10,10 @@ import java.io.Serializable;
 import java.util.List;
 
 
+/**
+ * Represent execution BUILD_MAP task result
+ * Serializing using mapdb, not work with records !!!
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(makeFinal = true)

@@ -1,17 +1,18 @@
 package springboot.web.downloader.task;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.xml.sax.SAXException;
 import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.dto.Edge;
 import springboot.web.downloader.dto.Node;
 import springboot.web.downloader.dto.SiteMapDto;
+import springboot.web.downloader.dto.Task;
 import springboot.web.downloader.enums.NodeType;
 import springboot.web.downloader.enums.StatusTask;
-import springboot.web.downloader.enums.TypeTask;
 import springboot.web.downloader.jaxb.IXmlUrlSet;
 import springboot.web.downloader.jaxb.http.XmlUrl;
-import springboot.web.downloader.registory.TaskRegistry;
+import springboot.web.downloader.registry.TaskRegistry;
 import springboot.web.downloader.utils.Utils;
 import springboot.web.downloader.wget.Wget;
 import springboot.web.downloader.zip.Zip;
@@ -19,7 +20,6 @@ import springboot.web.downloader.zip.Zip;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
@@ -28,43 +28,39 @@ import java.util.stream.Collectors;
  * WebTask have {@code taskId} identifier thought it
  * client able to monitoring WebTask status.
  * WebTask is Prototype bean and creation new way in {@code Config.class}
- * {<code>
- * public FunctionTwoArgs<String, String, WebTask> webTaskFactory()
- * </code>}
  */
 @Slf4j
-public class WebTask implements Callable<StatusTask> {
+public class WebTask implements Runnable {
 
     private final Wget wget;
     private final Zip zip;
-    private final String taskId;
-    private final String uri;
-    private final TypeTask typeTask;
+    private final Task task;
 
-    public WebTask(Wget wget, Zip zip, String taskId, String uri, TypeTask typeTask) {
+    public WebTask(Wget wget, Zip zip, Task task) {
         this.wget = wget;
         this.zip = zip;
-        this.taskId = taskId;
-        this.uri = uri;
-        this.typeTask = typeTask;
+        this.task = task;
     }
 
     @Override
-    public StatusTask call() throws Exception {
-        return switch (typeTask) {
+    @SneakyThrows
+    public void run() {
+        TaskRegistry.getRegistry().put(task.getTaskId(), task.setStatusTask(StatusTask.RUNNING));
+        StatusTask statusTask = switch (task.getParams().getTypeTask()) {
             case DOWNLOAD -> requireDownload();
             case ESTIMATE -> estimateSize();
             case BUILD_MAP -> buildMap();
         };
+        TaskRegistry.getRegistry().put(task.getTaskId(), task.setStatusTask(statusTask));
     }
 
     private StatusTask requireDownload() throws InterruptedException {
         try {
             int exitCode = 1;
-            String dir = WebDownloader.SITES + taskId;
+            String dir = WebDownloader.SITES + task.getTaskId();
             Utils.createDirectory(dir);
-            if (wget.download(uri, dir) == 0) {
-                exitCode = zip.wrapToZip(taskId);
+            if (wget.download(task.getParams().getUri(), dir) == 0) {
+                exitCode = zip.wrapToZip(task.getTaskId());
             }
             Utils.wgetLogging(dir);
             return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
@@ -76,9 +72,9 @@ public class WebTask implements Callable<StatusTask> {
 
     private StatusTask estimateSize() throws InterruptedException {
         try {
-            String dir = WebDownloader.SITES + taskId;
+            String dir = WebDownloader.SITES + task.getTaskId();
             Utils.createDirectory(dir);
-            int exitCode = wget.estimate(uri, dir);
+            int exitCode = wget.estimate(task.getParams().getUri(), dir);
             return (exitCode == 0) ? StatusTask.DONE : StatusTask.ERROR;
         } catch (IOException ex) {
             log.error(ex.getMessage());
@@ -89,10 +85,10 @@ public class WebTask implements Callable<StatusTask> {
     private StatusTask buildMap() throws InterruptedException {
         try {
             // 1 - create or generate sitemap.xml
-            IXmlUrlSet xmlUrlSet = wget.getSiteMap(uri, taskId);
+            IXmlUrlSet xmlUrlSet = wget.getSiteMap(task.getParams().getUri(), task.getTaskId());
             // 2 - transform to SiteMapDto.class
             SiteMapDto siteMap = buildTree(xmlUrlSet);
-            TaskRegistry.getResults().put(taskId, siteMap);
+            TaskRegistry.getResults().put(task.getTaskId(), siteMap);
             return StatusTask.DONE;
         } catch (IOException | JAXBException | SAXException ex) {
             log.error(ex.getMessage());

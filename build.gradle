@@ -41,6 +41,7 @@ dependencies {
 	implementation "com.sun.xml.bind:jaxb-impl:2.3.1"
 	implementation 'javassist:javassist:3.4.GA'
 	implementation 'com.sun.xml.bind:jaxb-xjc:2.3.0'
+	implementation 'org.mapdb:mapdb:3.1.0'
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

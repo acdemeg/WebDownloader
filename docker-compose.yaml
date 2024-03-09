@@ -11,6 +11,7 @@ services:
     working_dir: /server
     command: "java -jar WebDownloader.jar"
     volumes:
-      - ~/logs/web-downloader:/server/logs
+      - ~/web-downloader-data/logs:/server/logs
+      - ~/web-downloader-data/registry:/root/web-downloader-data/registry
     ports:
       - "8080:8080"

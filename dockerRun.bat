@@ -1,2 +1,4 @@
 gradle -x test build
-docker run -d --rm --name webd -p 8000:8080 -v .\build\libs:/server openjdk:21 java -jar /server/WebDownloader.jar
+docker run -d --rm --name webd -p 8080:8080 \
+-v .\build\libs:/server \
+-v .\build\libs\registry:/root/web-downloader-data/registry superjdk:21 java -jar /server/WebDownloader.jar

@@ -27,8 +27,7 @@ public final class TaskRegistry {
 
     @SneakyThrows
     private TaskRegistry() {
-        Thread.sleep(3_000); // for volumes sync
-        log.info("Create TaskRegistry");
+        Thread.sleep(1_000); // for volumes sync
         DB db = DBMaker.fileDB(WebDownloader.REGISTRY + "task_registry.db")
                 .closeOnJvmShutdown().fileMmapEnable().make();
         registry = (ConcurrentMap<String, Task>) db.hashMap("registry").createOrOpen();

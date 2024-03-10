@@ -1,5 +1,12 @@
 # WebDownloader
 
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/acdemeg/WebDownloader/build-workflow.yml?logo=gradle&labelColor=292f35)
+[![GitHub release (with filter)](https://img.shields.io/github/v/release/acdemeg/WebDownloader?logo=github&labelColor=292f35)](https://github.com/acdemeg/WebDownloader/releases)
+![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/acdemeg/WebDownloader?color=8B8C7A&labelColor=292f35)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/acdemeg/WebDownloader?color=DC143C&labelColor=292f35)
+![GitHub repo size](https://img.shields.io/github/repo-size/acdemeg/WebDownloader?color=008B8B&labelColor=292f35)
+![GitHub all releases](https://img.shields.io/github/downloads/acdemeg/WebDownloader/total?color=DB7093&labelColor=292f35)
+
 Project to aim persisting remote web resources on local storage
 also creating site mirror, graph-map of site, estimate of size
 web-site(static resources) etc. Based on WGET utility.

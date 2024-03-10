@@ -1,7 +1,6 @@
 package springboot.web.downloader.service;
 
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -9,9 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.dto.SiteMapDto;
+import springboot.web.downloader.dto.Task;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.StatusTask;
-import springboot.web.downloader.registory.TaskRegistry;
+import springboot.web.downloader.registry.TaskRegistry;
 import springboot.web.downloader.utils.FunctionTwoArgs;
 import springboot.web.downloader.utils.Utils;
 
@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Function;
 
 import static springboot.web.downloader.WebDownloader.DEFAULT_LANGUAGE;
@@ -32,14 +30,13 @@ class RestServiceTest {
     private final RestService restService;
     private static String taskId;
 
+    static {
+        Utils.prepareEnv();
+    }
+
     @Autowired
     RestServiceTest(final RestService restService) {
         this.restService = restService;
-    }
-
-    @BeforeAll
-    static void prepareEnvTest() throws IOException {
-        Utils.prepareEnv();
     }
 
     @AfterAll
@@ -49,7 +46,7 @@ class RestServiceTest {
 
     @Test
     @Order(10)
-    void requireDownloadSuccess() throws InterruptedException, ExecutionException {
+    void requireDownloadSuccess() {
         queryWithClientUrlSuccess(this.restService::requireDownload, "https://locallhost.com/");
     }
 
@@ -88,7 +85,7 @@ class RestServiceTest {
 
     @Test
     @Order(30)
-    void buildMapSiteSuccessOne() throws ExecutionException, InterruptedException {
+    void buildMapSiteSuccessOne() {
         queryWithClientUrlSuccess(this.restService::mapSite, "https://java-course.ru/");
     }
 
@@ -105,7 +102,7 @@ class RestServiceTest {
 
     @Test
     @Order(32)
-    void buildMapSiteSuccessTwo() throws ExecutionException, InterruptedException {
+    void buildMapSiteSuccessTwo() {
         queryWithClientUrlSuccess(this.restService::mapSite, "https://locallhost.com/");
     }
 
@@ -128,7 +125,7 @@ class RestServiceTest {
 
     @Test
     @Order(50)
-    void estimateSizeSuccess() throws InterruptedException, ExecutionException {
+    void estimateSizeSuccess() {
         queryWithClientUrlSuccess(this.restService::estimateSize, "https://locallhost.com/");
     }
 
@@ -154,55 +151,48 @@ class RestServiceTest {
     }
 
     @Test
-    void statusTaskRunning() throws ExecutionException, InterruptedException {
-        var response = statusTaskTest(false, null, false);
+    void statusTaskRunning() {
+        var response = statusTaskTest(StatusTask.RUNNING);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(StatusTask.RUNNING.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
-    void statusTaskError() throws ExecutionException, InterruptedException {
-        var response = statusTaskTest(true, StatusTask.ERROR, false);
+    void statusTaskError() {
+        var response = statusTaskTest(StatusTask.ERROR);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         Assertions.assertEquals(StatusTask.ERROR.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
-    void statusTaskDone() throws ExecutionException, InterruptedException {
-        var response = statusTaskTest(true, StatusTask.DONE, false);
+    void statusTaskDone() {
+        var response = statusTaskTest(StatusTask.DONE);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(StatusTask.DONE.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
     @Test
-    void statusTaskUndefined() throws ExecutionException, InterruptedException {
-        var response = statusTaskTest(true, StatusTask.DONE, true);
+    void statusTaskUndefined() {
+        var response = statusTaskTest(StatusTask.UNDEFINED);
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         Assertions.assertEquals(StatusTask.UNDEFINED.name(), Objects.requireNonNull(response.getBody()).getResult());
     }
 
-    private ResponseEntity<ResponseDto> statusTaskTest(final boolean isDone, final StatusTask statusTask, final boolean isThrowable)
-            throws ExecutionException, InterruptedException {
-        final String task = this.prepareMockTask(isDone, statusTask, isThrowable);
+    private ResponseEntity<ResponseDto> statusTaskTest(final StatusTask statusTask) {
+        final String task = this.prepareMockTask(statusTask);
         return restService.statusTask(task, DEFAULT_LANGUAGE);
     }
 
-    @SuppressWarnings("unchecked")
-    private String prepareMockTask(final boolean isDone, final StatusTask statusTask, final boolean isThrowable)
-            throws InterruptedException, ExecutionException {
-        final String task = UUID.randomUUID().toString();
-        Future<StatusTask> mockFuture = Mockito.mock(Future.class);
-        Mockito.when(mockFuture.isDone()).thenReturn(isDone);
-        if(isThrowable)
-            Mockito.when(mockFuture.get()).thenThrow(ExecutionException.class);
-        else Mockito.when(mockFuture.get()).thenReturn(statusTask);
-        TaskRegistry.getRegistry().put(task, mockFuture);
-        return task;
+    private String prepareMockTask(final StatusTask statusTask) {
+        final String taskId = UUID.randomUUID().toString();
+        Task mockTask = new Task(taskId, null).setStatusTask(statusTask);
+        TaskRegistry.getRegistry().put(taskId, mockTask);
+        return taskId;
     }
 
     @Test
-    void discoverSizeTestFileNotFound() throws ExecutionException, InterruptedException {
-        final String task = this.prepareMockTask(true, StatusTask.DONE, false);
+    void discoverSizeTestFileNotFound() {
+        final String task = this.prepareMockTask(StatusTask.DONE);
         var response = this.restService.getSize(task, DEFAULT_LANGUAGE);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(
@@ -216,15 +206,13 @@ class RestServiceTest {
         queryWithClientUrlError(this.restService::estimateSize);
     }
 
-    private void queryWithClientUrlSuccess(final Function<String, ResponseEntity<ResponseDto>> rest, String successUrl)
-            throws InterruptedException, ExecutionException {
-        final var response = rest.apply(successUrl);
+    private void queryWithClientUrlSuccess(final Function<String, ResponseEntity<ResponseDto>> rest, String successUrl) {
+        var response = rest.apply(successUrl);
         taskId = Objects.requireNonNull(Objects.requireNonNull(response.getBody()).getResult());
-        final var future = TaskRegistry.getRegistry().get(taskId);
-        StatusTask statusTask = future.get();
+        Task task = TaskRegistry.getRegistry().get(taskId);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(UUID.fromString(taskId).getClass(), UUID.class);
-        Assertions.assertEquals(StatusTask.DONE, statusTask);
+        Assertions.assertEquals(StatusTask.DONE, task.getStatusTask());
     }
 
     private void queryWithClientUrlError(final Function<String, ResponseEntity<?>> rest) {

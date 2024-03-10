@@ -2,6 +2,7 @@ package springboot.web.downloader.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -10,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import springboot.web.downloader.enums.NativeProcessName;
+import springboot.web.downloader.registry.TaskRegistry;
 import springboot.web.downloader.wget.WgetOptions;
 
 import java.io.File;
@@ -121,12 +123,17 @@ public final class Utils {
         return (int) url.chars().filter(ch -> ch == '/').count();
     }
 
-    public static void prepareEnv() throws IOException {
+    @SneakyThrows
+    public static void prepareEnv() {
         log.info("Create directories if not exist");
         FileUtils.forceMkdir(new File(SCRIPTS));
         FileUtils.forceMkdir(new File(SITES));
         FileUtils.forceMkdir(new File(ARCHIVED));
         FileUtils.forceMkdir(new File(SITEMAPS));
+        FileUtils.forceMkdir(new File(REGISTRY));
+
+        log.info("Create Task Registry");
+        TaskRegistry.create();
 
         log.info("Prepare shell script files");
         ClassPathResource discoverSize = new ClassPathResource("discover-size.sh");
@@ -136,6 +143,7 @@ public final class Utils {
         boolean successDiscoverSize = DISCOVER_SIZE_SCRIPT.setExecutable(true);
         boolean successSiteMapGenerator = SITEMAP_GENERATOR_SCRIPT.setExecutable(true);
         if (!(successSiteMapGenerator && successDiscoverSize)) {
+            log.error("Impossible give permission on execution");
             throw new IOException("Impossible give permission on execution");
         }
     }
@@ -145,5 +153,6 @@ public final class Utils {
         FileUtils.cleanDirectory(new File(SITES));
         FileUtils.cleanDirectory(new File(ARCHIVED));
         FileUtils.cleanDirectory(new File(SITEMAPS));
+        FileUtils.cleanDirectory(new File(REGISTRY));
     }
 }

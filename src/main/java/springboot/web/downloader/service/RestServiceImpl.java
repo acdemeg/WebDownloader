@@ -11,13 +11,13 @@ import springboot.web.downloader.WebDownloader;
 import springboot.web.downloader.annotations.CheckUriConnection;
 import springboot.web.downloader.dto.ResponseDto;
 import springboot.web.downloader.dto.SiteMapDto;
+import springboot.web.downloader.dto.Task;
 import springboot.web.downloader.enums.ErrorMessage;
 import springboot.web.downloader.enums.NativeProcessName;
 import springboot.web.downloader.enums.StatusTask;
 import springboot.web.downloader.enums.TypeTask;
-import springboot.web.downloader.registory.TaskRegistry;
+import springboot.web.downloader.registry.TaskRegistry;
 import springboot.web.downloader.task.WebTask;
-import springboot.web.downloader.utils.FunctionManyArgs;
 import springboot.web.downloader.utils.ResponseUtils;
 import springboot.web.downloader.utils.Utils;
 
@@ -34,35 +34,40 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 
 @Service
 public class RestServiceImpl implements RestService {
 
-    private final FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory;
+    private final Function<Task, WebTask> webTaskFactory;
 
     @Autowired
-    public RestServiceImpl(FunctionManyArgs<TypeTask, String, WebTask> webTaskFactory) {
+    public RestServiceImpl(Function<Task, WebTask> webTaskFactory) {
         this.webTaskFactory = webTaskFactory;
+        // restoring uncompleted task
+        TaskRegistry.getRegistry().values().stream()
+                .filter(task -> StatusTask.RUNNING.equals(task.getStatusTask()))
+                .forEach(this::runWebTask);
     }
 
     @Override
     @CheckUriConnection
     public ResponseEntity<ResponseDto> requireDownload(final String URI) {
-        return runWebTask(URI, TypeTask.DOWNLOAD);
+        return runWebTask(new Task(UUID.randomUUID().toString(), new Task.Params(URI, TypeTask.DOWNLOAD)));
     }
 
     @Override
     @CheckUriConnection
     public ResponseEntity<ResponseDto> estimateSize(final String URI) {
-        return runWebTask(URI, TypeTask.ESTIMATE);
+        return runWebTask(new Task(UUID.randomUUID().toString(), new Task.Params(URI, TypeTask.ESTIMATE)));
     }
 
     @Override
     @CheckUriConnection
     public ResponseEntity<ResponseDto> mapSite(final String URI) {
-        return runWebTask(URI, TypeTask.BUILD_MAP);
+        return runWebTask(new Task(UUID.randomUUID().toString(), new Task.Params(URI, TypeTask.BUILD_MAP)));
     }
 
     @Override
@@ -78,20 +83,15 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public ResponseEntity<ResponseDto> statusTask(final String taskId, final String lang) {
-        try {
-            var future = TaskRegistry.getRegistry().get(taskId);
-            if (Objects.isNull(future))
-                return ResponseUtils.notFound(ErrorMessage.TASK_NOT_FOUND.getMessage(lang));
-            if (!future.isDone())
-                return ResponseUtils.ok(StatusTask.RUNNING.getStatus(lang));
-            var result = future.get();
-            if (result.equals(StatusTask.ERROR))
-                return ResponseUtils.internalServerError(StatusTask.ERROR.getStatus(lang));
-            return ResponseUtils.ok(StatusTask.DONE.getStatus(lang));
-        } catch (Exception ex) {
-            Thread.currentThread().interrupt();
-            return ResponseUtils.internalServerError(StatusTask.UNDEFINED.getStatus(lang));
-        }
+        Task task = TaskRegistry.getRegistry().get(taskId);
+        if (Objects.isNull(task))
+            return ResponseUtils.notFound(ErrorMessage.TASK_NOT_FOUND.getMessage(lang));
+        return switch (task.getStatusTask()) {
+            case RUNNING -> ResponseUtils.ok(StatusTask.RUNNING.getStatus(lang));
+            case ERROR -> ResponseUtils.internalServerError(StatusTask.ERROR.getStatus(lang));
+            case DONE -> ResponseUtils.ok(StatusTask.DONE.getStatus(lang));
+            default -> ResponseUtils.internalServerError(StatusTask.UNDEFINED.getStatus(lang));
+        };
     }
 
     @Override
@@ -165,13 +165,11 @@ public class RestServiceImpl implements RestService {
         return response;
     }
 
-    private ResponseEntity<ResponseDto> runWebTask(final String URI, final TypeTask typeTask) {
-        String taskId = UUID.randomUUID().toString();
+    private ResponseEntity<ResponseDto> runWebTask(final Task task) {
         try(final var exec = Executors.newVirtualThreadPerTaskExecutor()) {
-            final var future = exec.submit(webTaskFactory.apply(taskId, URI, typeTask));
-            TaskRegistry.getRegistry().put(taskId, future);
+            exec.submit(webTaskFactory.apply(task));
             exec.shutdown();
-            return ResponseUtils.ok(taskId);
+            return ResponseUtils.ok(task.getTaskId());
         }
     }
 }

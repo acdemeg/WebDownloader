@@ -5,22 +5,24 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import springboot.web.downloader.utils.Utils;
 
-import java.io.IOException;
-
 
 @Slf4j
 @SpringBootApplication
 public class WebDownloader {
 
-    private static final String USER_HOME = System.getProperty("user.home");
-    public static final String SCRIPTS = USER_HOME + "/scripts/";
-    public static final String SITES = USER_HOME + "/sites/";
-    public static final String ARCHIVED = USER_HOME + "/archived/";
-    public static final String SITEMAPS = USER_HOME + "/sitemaps/";
+    private static final String HOME = System.getProperty("user.home") + "/web-downloader-data/";
+    public static final String SCRIPTS = HOME + "scripts/";
+    public static final String SITES = HOME + "sites/";
+    public static final String ARCHIVED = HOME + "archived/";
+    public static final String SITEMAPS = HOME + "sitemaps/";
+    public static final String REGISTRY = HOME + "registry/";
     public static final String DEFAULT_LANGUAGE = "Eng";
 
-    public static void main(String[] args) throws IOException {
+    static {
         Utils.prepareEnv();
+    }
+
+    public static void main(String[] args) {
         SpringApplication.run(WebDownloader.class, args);
     }
 }

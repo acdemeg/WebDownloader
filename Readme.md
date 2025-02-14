@@ -12,7 +12,7 @@ also creating site mirror, graph-map of site, estimate of size
 web-site(static resources) etc. Based on WGET utility.
 
 ## DEMO
-http://devproject.site:8002
+http://45.90.218.76/
 
 ## DockerHub
 https://hub.docker.com/repository/docker/acdemeg/web-downloader/general
